@@ -2,3 +2,5 @@
 .vscode/
 ex/
 jasmin.jar
+
+*.j
