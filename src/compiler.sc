@@ -136,28 +136,31 @@ def compile(prog: List[Decl], class_name: String) : String = {
 import ammonite.ops._
 
 def compile_to_file(prog: List[Decl], class_name: String) : Unit = 
-  write.over(pwd / s"$class_name.j", compile(prog, class_name))  
+  write.over(pwd/"jfiles"/s"$class_name.j", compile(prog, class_name))  
 
 
 @main
 def main1(fname: String): Unit = {
-    val path = os.pwd / fname
-	val class_name = fname.stripSuffix("." ++ path.ext)
-	compile_to_file(get_tree(fname),class_name)
+  val path = os.pwd / os.RelPath(fname)
+  val tmp = fname.stripSuffix("." ++ path.ext)
+  val class_name = tmp.substring(tmp.lastIndexOf("/")+1)  
+  compile_to_file(get_tree(fname),class_name)
 }
 
 @main
 def main2(fname: String) : Unit = {
-    val path = os.pwd / fname
-	val class_name = fname.stripSuffix("." ++ path.ext)
+  val path = os.pwd / os.RelPath(fname)
+  val tmp = fname.stripSuffix("." ++ path.ext)
+  val class_name = tmp.substring(tmp.lastIndexOf("/")+1)  
 	compile_to_file(get_tree(fname),class_name)
 	println(s"Start of compilation")
 	println(s"generated $class_name.j file")
-	os.proc("java", "-jar", "jasmin.jar", s"$class_name.j").call()
+	os.proc("java", "-jar", "bin/jasmin.jar", s"jfiles/$class_name.j").call()
 	println(s"generated $class_name.class file")
 	println(s"Run program")
 	println()
 	os.proc("java", s"${class_name}/${class_name}").call(stdout = os.Inherit)
 	println()
-	println(s"done.")
+  println(s"done.")
+  
 }

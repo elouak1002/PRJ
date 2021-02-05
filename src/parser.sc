@@ -64,7 +64,7 @@ def Prog[_: P]: P[List[Decl]] =
 import ammonite.ops._
 
 def get_tree(fname: String): List[Decl] = {
-	val prog = os.read(os.pwd / fname )
+	val prog = os.read(os.pwd / os.RelPath(fname) )
 	val tree = fastparse.parse(prog, Prog(_)).get
 	tree.value
 }
