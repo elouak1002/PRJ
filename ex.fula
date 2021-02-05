@@ -1,0 +1,13 @@
+def addT(x, y) = {
+  if (x == 0) { y } else {addT(x - 1, y + 1)}
+};
+
+def fib(index, prev, current) = {
+  if (index <= 0) {
+    current
+  } else {
+    fib(index - 1, prev + current, prev)
+  }
+};
+
+println(fib(20,1,0))
