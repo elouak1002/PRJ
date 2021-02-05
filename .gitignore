@@ -1,6 +1,8 @@
 .metals/
 .vscode/
-ex/
+class/
 jasmin.jar
 
+jasmin/
+bin/
 *.j
