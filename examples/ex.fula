@@ -1,8 +1,8 @@
-def addT(x, y) = {
+def addT(x: Int, y: Int) : Int = {
   if (x == 0) { y } else {addT(x - 1, y + 1)}
 };
 
-def fib(index, prev, current) = {
+def fib(index: Int, prev: Int, current: Int) : Int = {
   if (index <= 0) {
     current
   } else {

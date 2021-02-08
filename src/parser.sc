@@ -1,11 +1,12 @@
 import fastparse._
 import MultiLineWhitespace._
 
+{
 abstract class Expr
 abstract class BExp 
 abstract class Decl 
 
-case class Def(name: String, args: Seq[String], body: Expr) extends Decl
+case class Def(name: String, args: Seq[(String,String)], typ: String, body: Expr) extends Decl
 case class Main(e: Expr) extends Decl
 
 case class Call(name: String, args: Seq[Expr]) extends Expr
@@ -23,9 +24,10 @@ def uppercase[_ : P]  = P( CharIn("A-Z") )
 def letter[_ : P]     = P( lowercase | uppercase )
 def digit [_ : P]     = P( CharIn("0-9") )
 
+def Typ[_ : P]: P[String] =  P( ("Int" | "Double" | "Unit") ~ End ).!
+
 def Number[_ : P]: P[Int] =  P( digit.rep(1) ).!.map(_.toInt)
 def Iden[_ : P]: P[String] = P( letter ~ (letter | digit | "_").rep ).!
-
 
 def Exp[_ : P]: P[Expr] = 
 	P ( P("if" ~ BExp ~ "{" ~ Exp ~ "}" ~ "else" ~ "{" ~ Exp ~ "}").map{ If.tupled } 
@@ -54,8 +56,8 @@ def BExp[_ : P]: P[BExp] =
 	| P(Exp ~ "<=" ~ Exp).map{ case (x, z) => Bop("<=", x, z)} 
 	| "(" ~ BExp ~ ")"  )
 
-def Func[_: P]: P[Decl] = P( P( "def" ~/ Iden ~ "(" ~ Iden.rep(0, ",") ~ ")" ~ "=" ~ "{" ~ Exp ~ "}" ).map(Def.tupled) )
-
+def Func[_: P]: P[Decl] = P( P( "def" ~/ Iden ~ "(" ~ Args.rep(0,",") ~ ")" ~ ":" ~ Typ ~ "=" ~ "{" ~ Exp ~ "}" ).map(Def.tupled) )
+}
 
 def Prog[_: P]: P[List[Decl]] =
 	P( P(Func ~ ";" ~ Prog).map{ case (x,y) => x :: y } 
@@ -74,3 +76,23 @@ def get_tree(fname: String): List[Decl] = {
 def main(fname: String): Unit = {
 	println(get_tree(fname))
 }
+
+
+val prog = """def fib(index: Int) : Int = {
+  if (index <= 0) {
+    current
+  } else {
+    fib(index - 1, prev + current, prev)
+  }
+}
+"""
+
+val test = "index : Int"
+
+def Args[_ : P]: P[(String,String)] = P (Iden ~ ":" ~ Typ).map{
+	case (id,typ) => (id,typ)
+}
+
+def Test2[_ : P] = P (Args ~ "," ~ Args )
+
+fastparse.parse(test, Args(_))
