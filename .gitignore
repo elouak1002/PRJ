@@ -6,3 +6,8 @@ jasmin.jar
 jasmin/
 bin/
 *.j
+
+mill.nMZI
+
+project/
+target/
