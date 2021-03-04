@@ -1,5 +1,6 @@
-package frontend;
+package frontend.parser;
 
+import frontend.ast.Ast;
 import fastparse._
 import fastparse.MultiLineWhitespace._
 

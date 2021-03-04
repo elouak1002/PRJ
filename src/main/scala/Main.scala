@@ -1,5 +1,5 @@
-import frontend.Fula;
-import frontend.Ast;
+import frontend.parser.Fula;
+import frontend.ast.Ast;
 
 import cats.effect.IO;
 import fastparse._

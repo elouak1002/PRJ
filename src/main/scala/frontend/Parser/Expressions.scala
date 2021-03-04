@@ -1,5 +1,6 @@
-package frontend;
+package frontend.parser;
 
+import frontend.ast.Ast;
 import fastparse._
 import fastparse.MultiLineWhitespace._
 
@@ -58,6 +59,6 @@ object Expressions {
 
 	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | value | int | double )
 
-	def block[_ : P]: P[Ast.Block] = P ( semi_chain(expr) | expr.map{ case expr => List(expr) } )
+	def block[_ : P]: P[Ast.Block] = P ( expr.map{ case expr => List(expr) } | semi_chain(expr)  )
 
 }
