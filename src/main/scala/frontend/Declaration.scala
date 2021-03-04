@@ -1,7 +1,7 @@
 package frontend;
 
 import fastparse._
-import fastparse.NoWhitespace._
+import fastparse.MultiLineWhitespace._
 
 /**
   * 
