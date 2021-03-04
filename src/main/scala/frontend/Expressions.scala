@@ -3,40 +3,61 @@ package frontend;
 import fastparse._
 import fastparse.MultiLineWhitespace._
 
+/**
+  * 
+  */
 object Expressions {
+	
+	// helpers for bexp
+	def eq[_ : P] : P[Ast.Bexp] =  P(aexp ~ "==" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("==", x, z)} 
+	def diff[_ : P] : P[Ast.Bexp] =  P(aexp ~ "!=" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("!=", x, z)} 
+	def lt[_ : P] : P[Ast.Bexp] =  P(aexp ~ "<" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<", x, z)} 
+	def lte[_ : P] : P[Ast.Bexp] =  P(aexp ~ "<=" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<=", x, z)} 
+	def gt[_ : P] : P[Ast.Bexp] =  P(aexp ~ ">" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<", z, x)} 
+	def gte[_ : P] : P[Ast.Bexp] =  P(aexp ~ ">=" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<=", z, x)} 
+	def bexp_paren[_ : P] : P[Ast.Bexp] = P( "(" ~ bexp ~ ")" )
 
-	// def Exp[_ : P]: P[Expr] = 
-	// 	P ( P("if" ~ BExp ~ "{" ~ Exp ~ "}" ~ "else" ~ "{" ~ Exp ~ "}").map{ If.tupled } 
-	// 	| P(M ~ ";" ~ Exp).map{Sequence.tupled}
-	// 	| M )
+	// bexp
+	def bexp[_ : P]: P[Ast.Bexp] = 	P( eq | diff | lt | lte | gt | gte | bexp_paren )
 
-	// def M[_ : P]: P[Expr] =
-	// 	P( P("println" ~ "(" ~ L ~ ")").map(Write) | L )
+	// parsing of integers, double and values
+	def int[_: P] : P[Ast.Expr.IntExpr] = P (Lexicals.Integer).map{ case( Ast.Tok.IntegerTok(num)) => Ast.Expr.IntExpr(num)}
+	def double[_: P] : P[Ast.Expr.DoubleExpr] = P (Lexicals.Double).map{ case( Ast.Tok.DoubleTok(num)) => Ast.Expr.DoubleExpr(num)}
+	def value[_ : P] : P[Ast.Expr.Value] = P (Lexicals.Identifier).map{ case(Ast.Tok.Identifier(id)) => Ast.Expr.Value(id) }
+	
+	//helpers for aexp
+	def chainA[_: P](p: => P[Ast.Expr], op: => P[String]) = P( p ~ (op ~ p).rep ).map{case (lhs, rhs) =>rhs.foldLeft(lhs){case (lhs, (op, rhs)) =>Ast.Expr.Aop(op, lhs, rhs)}}
+	def aexp_paren[_ : P] : P[Ast.Expr] = P (  "(" ~ aexp ~ ")" )
+	def op[_ : P](op: String) = P (op).!
 
-	// def L[_ : P]: P[Expr] =
-	// 	P( P(T ~ "+" ~ Exp).map{ case(x,y) => Aop("+", x, y)} | P(T ~ "-" ~ Exp).map{ case(x,y) => Aop("-", x, y) } | T )
+	// aexp 
+	def aexp[_ : P] : P[Ast.Expr] = P (chainA(factor,op("+")|op("-")))
+	def factor[_ : P] : P[Ast.Expr] = P (chainA(atom,op("*")|op("%")|op("/")))
+	def atom[_ : P] : P[Ast.Expr] = P ( int | double | value | aexp_paren )
 
-	// def T[_ : P]: P[Expr] =
-	// 	P( P(F ~ "*" ~ Exp).map{ case(x,y) => Aop("*", x, y)} | P(F ~ "/" ~ Exp).map{ case(x,y) => Aop("/", x, y) } | P(F ~ "%" ~ Exp).map{ case(x,y) => Aop("%", x, y) } | F )
+	// Helper for chaining expr into a seq of expr
+	def semi_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(0,";") ~ ";")
 
-	// def F[_: P]: P[Expr] = 
-	// 	P (	P(Iden ~ "(" ~ Exp.rep(0, ",") ~ ")" ).map{ Call.tupled } | P ("(" ~ Exp ~ ")")  | Iden.map{Str} | Number.map{Num})
+	// Helper for chaining argument of assign
+	def comma_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(0,",") )
+	
+	// if expression
+	def if_expr[_ : P] : P[Ast.Expr.If] = P ( "if" ~ "(" ~ bexp ~ ")" ~ "{" ~ block ~ "}" ~ "else" ~ "{" ~  block ~ "}").map{
+		case (bexp,if_seq,else_seq) => Ast.Expr.If(bexp,if_seq,else_seq)
+	}
 
-	// def BExp[_ : P]: P[BExp] = 
-	// P(  P(Exp ~ "==" ~ Exp).map{ case (x, z) => Bop("==", x, z)} 
-	// 	| P(Exp ~ "!=" ~ Exp).map{ case (x, z) => Bop("!=", x, z)}  
-	// 	| P(Exp ~ "<" ~ Exp).map{ case (x, z) => Bop("<", x, z)}  
-	// 	| P(Exp ~ ">" ~ Exp).map{ case (x, z) => Bop("<", z, x)}  
-	// 	| P(Exp ~ ">=" ~ Exp).map{ case (x, z) => Bop("<=", z, x)}  
-	// 	| P(Exp ~ "<=" ~ Exp).map{ case (x, z) => Bop("<=", x, z)} 
-	// 	| "(" ~ BExp ~ ")"  )
+	// assign expression (calling a function)
+	def assign_expr[_ : P]: P[Ast.Expr.Assign] = P ( Lexicals.Identifier ~ "(" ~ comma_chain(expr) ~ ")" ).map{
+		case (Ast.Tok.Identifier(id),exprs) => Ast.Expr.Assign(id, exprs)
+	}
 
-	// def Args[_ : P]: P[Seq[(Identifier,Type)]] = P ((Iden ~ ":" ~ Typ).rep(0,","))
+	def write_expr[_ : P]: P[Ast.Expr.Write] = P ("println" ~ "(" ~ expr ~ ")").map{ case (expr) => Ast.Expr.Write(expr) }
 
-	// def Func[_: P]: P[Decl] = P( P( "def" ~/ Iden ~ "(" ~ Args ~ ")" ~ ":" ~ Typ ~ "=" ~ "{" ~ Exp ~ "}" ).map(Def.tupled) )
-		
-	// def Prog[_: P]: P[List[Decl]] =
-	// 	P( P(Func ~ ";" ~ Prog).map{ case (x,y) => x :: y } 
-	// 	| P(Exp).map{ case x => List(Main(x)) } )
-		
+	// assigning an expression to a value
+	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
+
+	def expr[_ : P]: P[Ast.Expr] = P ( int | double | value | if_expr | assign_expr | val_expr )
+
+	def block[_ : P]: P[Ast.Block] = P ( semi_chain(expr) )
+
 }

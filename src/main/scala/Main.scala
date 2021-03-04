@@ -1,4 +1,4 @@
-import frontend.Statements;
+import frontend.Fula;
 
 object Main {
 
@@ -14,6 +14,7 @@ object Main {
 	// }
 
 	def main(args: Array[String]): Unit = {
+		println(args)
 	}
 
 }

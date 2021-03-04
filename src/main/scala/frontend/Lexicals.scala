@@ -3,14 +3,29 @@ package frontend;
 import fastparse._
 import fastparse.NoWhitespace._
 
+/**
+  * 
+  */
 object Lexicals {
 
-	// def lowercase [_ : P] : P[String] = P( CharIn("a-z") ).!
-	// def uppercase[_ : P] : P[String] = P( CharIn("A-Z") ).!
-	// def letter[_ : P] : P[String]  = P( lowercase | uppercase ).!
-	// def digit [_ : P] : P[String]  = P( CharIn("0-9") ).!
+ 	val keywordList: Set[String] = Set("if", "else", "def")
 
-	// def Num[_ : P] : P[Ast.Tok.Number] = P ( digit.rep(1)).!.map(_.toInt).map{ case num => Ast.Tok.Number(num)}
-	// def Typ[_ : P] : P[Ast.Tok.Type] =  P( ("Int" | "Double" | "Unit")).!.map{ case (typ) => Ast.Tok.Type(typ) }
-	// def Iden[_ : P]: P[Ast.Tok.Identifier] = P( letter ~ (letter | digit | "_").repX).!.map{ case iden => Ast.Tok.Identifier(iden)}
+	 // Tokens
+	def lowercase [_ : P] : P[String] = P( CharIn("a-z") ).!
+	def uppercase[_ : P] : P[String] = P( CharIn("A-Z") ).!
+	def letter[_ : P] : P[String]  = P( lowercase | uppercase ).!
+	def digit [_ : P] : P[String]  = P( CharIn("0-9") ).!
+	def unsignedIntegerStr[_ : P] : P[String] = P( digit.rep(1) ).!
+	// Signed Integer to String parser
+	def IntegerStr[_ : P] : P[String] = P ( "-".?.! ~ unsignedIntegerStr).!
+
+	// An integer
+	def Integer[_ : P] : P[Ast.Tok.IntegerTok] = P(IntegerStr).map(_.toInt).map{ case num => Ast.Tok.IntegerTok(num)}
+	// A double
+	def Double[_ : P] : P[Ast.Tok.DoubleTok] = P (  IntegerStr ~ "." ~ unsignedIntegerStr ).!.map(_.toDouble).map{ case num => Ast.Tok.DoubleTok(num)}
+	// A type
+	def Type[_ : P] : P[Ast.Tok.Type] =  P( ("Int" | "Double" | "Unit")).!.map{ case (typ) => Ast.Tok.Type(typ) }
+	// An identifier (name of function, name of value)
+	def Identifier[_ : P]: P[Ast.Tok.Identifier] = P( letter ~ (letter | digit | "_").repX).!.filter(!keywordList.contains(_)).map{ case iden => Ast.Tok.Identifier(iden)}
+	
 }
