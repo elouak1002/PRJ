@@ -3,6 +3,7 @@ package frontend.parser;
 import frontend.ast.Ast;
 import fastparse._
 import fastparse.MultiLineWhitespace._
+import org.xml.sax.ext.LexicalHandler
 
 /**
   * 
@@ -21,9 +22,10 @@ object Expressions {
 	// bexp
 	def bexp[_ : P]: P[Ast.Bexp] = 	P( eq | diff | lt | lte | gt | gte | bexp_paren )
 
-	// parsing of integers, double and values
+	// parsing of integers, double, boolean and values
 	def int[_: P] : P[Ast.Expr.IntExpr] = P (Lexicals.Integer).map{ case( Ast.Tok.IntegerTok(num)) => Ast.Expr.IntExpr(num)}
 	def double[_: P] : P[Ast.Expr.DoubleExpr] = P (Lexicals.Double).map{ case( Ast.Tok.DoubleTok(num)) => Ast.Expr.DoubleExpr(num)}
+	def boolean[_ : P] : P[Ast.Expr.BooleanExpr] = P(Lexicals.Boolean).map{ case( Ast.Tok.BooleanTok(bool)) => Ast.Expr.BooleanExpr(bool)}
 	def value[_ : P] : P[Ast.Expr.Value] = P (Lexicals.Identifier).map{ case(Ast.Tok.Identifier(id)) => Ast.Expr.Value(id) }
 	
 	//helpers for aexp
@@ -57,7 +59,7 @@ object Expressions {
 	// assigning an expression to a value
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | value | int | double )
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | value | int | double | boolean )
 
 	def block[_ : P]: P[Ast.Block] = P ( expr.map{ case expr => List(expr) } | semi_chain(expr)  )
 
