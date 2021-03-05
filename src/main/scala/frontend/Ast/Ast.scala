@@ -11,6 +11,7 @@ object Ast {
 		case class Identifier(iden: String) extends Tok
 		case class IntegerTok(num: Int) extends Tok
 		case class DoubleTok(num: Double) extends Tok
+		case class BooleanTok(num: Boolean) extends Tok
 		case class Type(typ: String) extends Tok
 	}
 

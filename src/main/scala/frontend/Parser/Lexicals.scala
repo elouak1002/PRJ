@@ -19,7 +19,10 @@ object Lexicals {
 	def unsignedIntegerStr[_ : P] : P[String] = P( digit.rep(1) ).!
 	// Signed Integer to String parser
 	def IntegerStr[_ : P] : P[String] = P ( "-".?.! ~ unsignedIntegerStr).!
+	def BooleanStr[_ : P] : P[String] = P ("True" | "False").!
 
+	// A boolean value
+	def Boolean[_ : P] : P[Ast.Tok.BooleanTok] = P(BooleanStr).map(_.toBoolean).map{ case bool => Ast.Tok.BooleanTok(bool) }
 	// An integer
 	def Integer[_ : P] : P[Ast.Tok.IntegerTok] = P(IntegerStr).map(_.toInt).map{ case num => Ast.Tok.IntegerTok(num)}
 	// A double
