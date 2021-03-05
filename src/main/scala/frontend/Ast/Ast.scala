@@ -31,6 +31,7 @@ object Ast {
 		case class Write(e: Expr) extends Expr
 		case class IntExpr(i: Int) extends Expr
 		case class DoubleExpr(d: Double) extends Expr
+		case class BooleanExpr(b: Boolean) extends Expr
 		case class Aop(o: String, a1: Expr, a2: Expr) extends Expr
 		case class Val(name: String, typ: String, e: Expr) extends Expr
 	}
