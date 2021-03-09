@@ -39,7 +39,7 @@ object Expressions {
 	def atom[_ : P] : P[Ast.Expr] = P ( int | double | value | aexp_paren )
 
 	// Helper for chaining expr into a seq of expr
-	def semi_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(1,";") ~ ";")
+	def semi_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(1,";"))
 
 	// Helper for chaining argument of assign
 	def comma_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(0,",") )
@@ -54,13 +54,16 @@ object Expressions {
 		case (Ast.Tok.Identifier(id),exprs) => Ast.Expr.Assign(id, exprs)
 	}
 
+	// println expression -> by default in the language.
 	def write_expr[_ : P]: P[Ast.Expr.Write] = P ("println" ~ "(" ~ expr ~ ")").map{ case (expr) => Ast.Expr.Write(expr) }
 
 	// assigning an expression to a value
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | value | int | double | boolean )
+	// an expression
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | boolean | val_expr | value | double | int )
 
-	def block[_ : P]: P[Ast.Block] = P ( expr.map{ case expr => List(expr) } | semi_chain(expr)  )
+	// an expression block
+	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.expr) ~ ";" | Expressions.expr.map{ case expr => List(expr) } ~ ";")
 
 }
