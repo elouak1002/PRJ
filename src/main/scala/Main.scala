@@ -12,7 +12,7 @@ object Main {
 		try {
 		Right(scala.io.Source.fromFile(filename).mkString)
 		} 
-		catch {case e: Exception => Left(println("No file named " + filename))}
+		catch {case e: Exception => Left(println("No file named " + filename + "."))}
 	}
 	
 	def get_tree(prog: String): IO[Either[Unit,Ast.Prog]] = IO {
@@ -20,7 +20,7 @@ object Main {
 			val tree = fastparse.parse(prog, Fula.Prog(_)).get 
 			Right(tree.value) 
 		} 
-		catch { case e: Exception => Left(println("Syntax error")) }
+		catch { case e: Exception => Left(println("Syntax error.")) }
 	}
 
 	def get_ast(filename: String) : EitherT[IO,Unit,Ast.Prog] = for {
