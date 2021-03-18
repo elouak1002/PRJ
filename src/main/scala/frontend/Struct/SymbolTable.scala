@@ -27,6 +27,10 @@ object SymbolTable {
 		case Root(_) => None
 		case Node(_,parent) => Some(parent)
 	}
+
+	def lookupSymbol(symTable: SymbolTable, symIn: Symbol, f: (SymbolTable, String) => Option[Symbol]) : Option[Symbol] = {
+		f(symTable,symIn.name).flatMap(sym => if (symIn == sym) Some(sym) else None)
+	}
 	
 	def lookup(symTable: SymbolTable, symbol: String) : Option[Symbol] = symTable match {
 		case Root(table) => getFromMap(table,symbol)
