@@ -6,10 +6,10 @@ import frontend.struct.Sym._;
 
 import frontend.typer.TypeChecker._;
 
-import frontend.ast.TypeAst._;
-import frontend.ast.Ast._;
-import frontend.ast.FLType._;
-import frontend.ast._;
+import ast.TypeAst._;
+import ast.Ast._;
+import ast.FLType._;
+import ast._;
 
 object DeclTyper {
 

@@ -1,8 +1,8 @@
 package frontend.parser;
 
+import ast.Ast;
 import fastparse._;
 import fastparse.Parsed;
-import frontend.ast.Ast;
 
 object ProgParser {
 

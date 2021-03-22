@@ -1,5 +1,5 @@
-import frontend.ast.Ast;
-import frontend.ast.TypeAst;
+import ast.Ast;
+import ast.TypeAst;
 
 import frontend.parser.ProgParser;
 import frontend.typer.ProgTyper;

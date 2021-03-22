@@ -1,7 +1,7 @@
 package frontend.typer;
 
-import frontend.ast.FLType._;
-import frontend.ast._;
+import ast.FLType._;
+import ast._;
 
 object TypeChecker {
 	

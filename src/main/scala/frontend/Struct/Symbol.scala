@@ -1,7 +1,7 @@
 package frontend.struct;
-import frontend.ast.Ast._;
-import frontend.ast.FLType._;
-import frontend.ast._;
+import ast.Ast._;
+import ast.FLType._;
+import ast._;
 
 trait SymbolCat
 case object ValueSym extends SymbolCat

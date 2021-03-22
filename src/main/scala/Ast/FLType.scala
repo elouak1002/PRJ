@@ -1,4 +1,4 @@
-package frontend.ast;
+package ast;
 
 trait FLType
 case object FLInt extends FLType

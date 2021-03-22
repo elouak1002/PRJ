@@ -1,6 +1,6 @@
 package backend;
 
-import frontend.ast.Ast;
+import ast.Ast;
 
 object CompileBexp {
 

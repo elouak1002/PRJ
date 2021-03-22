@@ -1,7 +1,7 @@
 package frontend.struct;
 
 import frontend.struct.Sym._;
-import frontend.ast._;
+import ast._;
 
 trait SymbolTable
 

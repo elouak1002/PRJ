@@ -1,7 +1,7 @@
 package frontend.typer;
 
-import frontend.ast.Ast._;
-import frontend.ast._;
+import ast.Ast._;
+import ast._;
 import frontend.struct._;
 
 object ProgTyper {
