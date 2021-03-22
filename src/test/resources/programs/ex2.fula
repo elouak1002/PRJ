@@ -1,0 +1,15 @@
+def fib(): Int = {
+	val x: Int = 2;
+	if (x == 2) { 
+		val y: Int = 20; 
+		y; 
+	} 
+	else { 
+		val y: Int = 30; 
+		y; 
+	};
+};
+
+def main(): Unit = {
+	println(fib());
+};

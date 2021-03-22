@@ -5,6 +5,8 @@ package frontend.ast;
   */
 object Ast {
 
+	sealed trait AstNode
+
 	// Tokens used for preparsing (form of lexer)
 	sealed trait Tok 
 	object Tok {
@@ -19,12 +21,12 @@ object Ast {
 	type Block = Seq[Expr]
 	
 	// A boolean expression
-	sealed trait Bexp
+	sealed trait Bexp extends AstNode
 	object Bexp {
 		case class Bop(o: String, a1: Expr, a2: Expr) extends Bexp
 	}
 
-	sealed trait Expr 
+	sealed trait Expr extends AstNode
 	object Expr {
 		case class If(a: Bexp, e1: Block, e2: Block) extends Expr
 		case class Assign(name: String, args: Seq[Expr]) extends Expr
@@ -37,10 +39,10 @@ object Ast {
 		case class Val(name: String, typ: String, e: Expr) extends Expr
 	}
 	
-	sealed trait Decl 
+	sealed trait Decl extends AstNode
 	object Decl	{
 		case class Def(name: String, args: Seq[(String,String)], typ: String, body: Block) extends Decl
-		case class Main(name: String="main", typ:String="Unit", body: Block) extends Decl
+		case class Main(name: String="main", typ: String="Unit", body: Block) extends Decl
 	}
 	
 	type Prog = Seq[Decl]

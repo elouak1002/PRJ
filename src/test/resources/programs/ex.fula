@@ -1,20 +1,36 @@
-def test() : Unit = {
-	unit();
-	unit();
-	10.03;
+def test10(x : Int) : Int = {
+	test10(10);
 };
 
-def test() : Unit = {
-	unit();
-	unit();
-	10.03;
+def test(x: Double) : Double = {
+	10.02;
+};
+
+def try(x: Int) : Int = {
+	val x2: Int = 10;
+	if (x2==10) {
+		val x2: Int = 10;
+		10;
+	} else {
+		10;
+	};
+	x;
+};
+
+def test3(y: Int) : Double = {
+	val x: Double = if (y==20) {
+		20.02;
+	} else {
+		10.02;
+	};
+	test(10.02);
 };
 
 def main() : Unit = {
-	val test : Int = 10;
-	if (10==30) {
-		10;
-	} else {
-		20;
-	};
+	10;
+	10.02;
+	10.02;
+	10.02;
+	10.02;
+	println(10);
 };

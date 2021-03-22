@@ -3,7 +3,6 @@ package frontend.parser;
 import frontend.ast.Ast;
 import fastparse._
 import fastparse.MultiLineWhitespace._
-import org.xml.sax.ext.LexicalHandler
 
 /**
   * 
@@ -36,7 +35,7 @@ object Expressions {
 	// aexp 
 	def aexp[_ : P] : P[Ast.Expr] = P (chainA(factor,op("+")|op("-")))
 	def factor[_ : P] : P[Ast.Expr] = P (chainA(atom,op("*")|op("%")|op("/")))
-	def atom[_ : P] : P[Ast.Expr] = P ( int | double | value | aexp_paren )
+	def atom[_ : P] : P[Ast.Expr] = P ( double | value | int | aexp_paren )
 
 	// Helper for chaining expr into a seq of expr
 	def semi_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(1,";"))
@@ -61,7 +60,7 @@ object Expressions {
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
 	// an expression
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | boolean | val_expr | value | double | int )
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | aexp | double | boolean | value | double | int )
 
 	// an expression block
 	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.expr) ~ ";" | Expressions.expr.map{ case expr => List(expr) } ~ ";")

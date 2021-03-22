@@ -1,0 +1,18 @@
+List(
+	Def(test,List((x,Int)),Int,
+		List(
+			Assign(test,List(IntExpr(10))), 
+			IntExpr(2)
+			)
+		), 
+	Main(main,Unit,
+		List(
+			IntExpr(10), 
+			DoubleExpr(10.02), 
+			DoubleExpr(10.02), 
+			DoubleExpr(10.02), 
+			DoubleExpr(10.02), 
+			Write(IntExpr(10))
+			)
+		)
+)

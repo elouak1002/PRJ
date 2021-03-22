@@ -9,7 +9,7 @@ import cats.data.EitherT;
 import fastparse._
 import scala.io.Source;
 
-object Main {
+object Main2 {
 
 	def readFile(filename: String) : IO[Either[String,String]] = IO {
 		try {
@@ -23,10 +23,10 @@ object Main {
 		catch {case e: Exception => Left("You must enter a filename.")}
 	}
 
-	def compileProg(prog: String) : Either[String, TypeAst.TypeProg] = for {
+	def compileProg(prog: String) : Either[String, Ast.Prog] = for {
 		tree <- ProgParser.parseProg(prog)
-		typeTree <- ProgTyper.typeProg(tree)
-	} yield (typeTree)
+		// typeTree <- ProgTyper.typeProg(tree)
+	} yield (tree)
 
 	def getProgString(args: Array[String]) : IO[Either[String,String]] = {
 		getFileName(args) match {
@@ -37,7 +37,7 @@ object Main {
 
 	def main(args: Array[String]) : Unit = {
 
-		val progString: IO[Either[String,TypeAst.TypeProg]] = getProgString(args).map({
+		val progString: IO[Either[String,Ast.Prog]] = getProgString(args).map({
 			case Right(progStr) => compileProg(progStr)
 			case Left(error) => Left(error)
 		})
