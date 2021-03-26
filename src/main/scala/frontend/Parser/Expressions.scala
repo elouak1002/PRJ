@@ -60,7 +60,7 @@ object Expressions {
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
 	// an expression
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | aexp | double | boolean | value | double | int )
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | aexp | double | boolean | value | int )
 
 	// an expression block
 	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.expr) ~ ";" | Expressions.expr.map{ case expr => List(expr) } ~ ";")
