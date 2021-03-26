@@ -5,7 +5,6 @@ import frontend.parser.ProgParser;
 import frontend.typer.ProgTyper;
 
 import cats.effect._;
-import cats.data.EitherT;
 import fastparse._
 import scala.io.Source;
 
