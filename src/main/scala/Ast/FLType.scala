@@ -9,7 +9,7 @@ case class FLFunc(args: Seq[FLType], typ: FLType) extends FLType
 
 object FLType {
 
-	def createFuncType(argsTyp: Seq[String], typ: String) : FLType = 
+	def createFuncType(argsTyp: Seq[String], typ: String) : FLFunc = 
 		FLFunc(argsTyp.map(createSingleType(_)), createSingleType(typ))
 
 	def createSingleType(typ: String): FLType = typ match {
