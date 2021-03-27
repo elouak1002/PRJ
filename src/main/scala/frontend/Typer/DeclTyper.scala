@@ -34,13 +34,13 @@ object DeclTyper {
 			typeOfBlock = getBlockType(tyBlock) // type of a block is the type of the last expression of the block.
 			typeOfDef = createSingleType(typ)
 			declType <- typeEqual(typeOfBlock,typeOfDef)
-		} yield (TypeAst.TypeDecl.TyDef(name,args,tyBlock,declType))
+		} yield (TypeAst.TypeDecl.TyDef(name,args,tyBlock,createFuncType(args.map(_._2),typ)))
 		
-		case  Ast.Decl.Main(_,_,body) => for {
+		case Ast.Decl.Main(_,_,body) => for {
 			tyBlock <- ExprTyper.typeBlock(body,symT)
 			typeOfBlock = getBlockType(tyBlock) // type of a block is the type of the last expression of the block.
 			mainType <- typeEqual(typeOfBlock,FLUnit)
-		} yield (TypeAst.TypeDecl.TyMain(body=tyBlock,typed=mainType))
+		} yield (TypeAst.TypeDecl.TyMain(body=tyBlock))
 	 }
 
 	 /**
