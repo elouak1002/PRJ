@@ -28,8 +28,8 @@ object TypeAst {
 	
 	sealed trait TypeDecl extends TypeAstNode
 	object TypeDecl	{
-		case class TyDef(name: String, args: Seq[(String,String)], body: TypeBlock, typed: FLType) extends TypeDecl
-		case class TyMain(name: String="main", body: TypeBlock, typed: FLType=FLFunc(Seq(),FLUnit)) extends TypeDecl
+		case class TyDef(name: String, args: Seq[(String,String)], body: TypeBlock, typed: FLFunc) extends TypeDecl
+		case class TyMain(name: String="main", body: TypeBlock, typed: FLFunc=FLFunc(Seq(),FLUnit)) extends TypeDecl
 	}
 
 	type TypeProg = Seq[TypeDecl]
