@@ -95,7 +95,7 @@
 //   case Bop("!=", a1, a2) => 
 //     compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpeq $jmp"
 //   case Bop("<", a1, a2) => 
-//     compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpge $jmp"
+//     compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpge $jmp"fbe
 //   case Bop("<=", a1, a2) => 
 //     compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpgt $jmp"
 // }

@@ -59,10 +59,13 @@ object Expressions {
 	// assigning an expression to a value
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
-	// an expression
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | val_expr | aexp | double | boolean | value | int )
+	// An assignable to a singleton value expression
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | aexp | double | boolean | value | int )
+
+	// An expression that can appear on a block
+	def block_expr[_ : P]: P[Ast.Expr] = P ( val_expr | expr )
 
 	// an expression block
-	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.expr) ~ ";" | Expressions.expr.map{ case expr => List(expr) } ~ ";")
+	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.block_expr) ~ ";" | Expressions.block_expr.map{ case expr => List(expr) } ~ ";")
 
 }

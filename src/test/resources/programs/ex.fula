@@ -23,7 +23,7 @@ def test3(y: Int) : Double = {
 	} else {
 		10.02;
 	};
-	test(10.02);
+	test(x);
 };
 
 def main() : Unit = {

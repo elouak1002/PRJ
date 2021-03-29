@@ -74,7 +74,7 @@ object ExprTyper {
 		case Ast.Expr.IntExpr(num) => Right(TypeAst.TypeExpr.TyIntExpr(num,FLInt)) 
 		case Ast.Expr.DoubleExpr(num) => Right(TypeAst.TypeExpr.TyDoubleExpr(num,FLDouble))
 		case Ast.Expr.BooleanExpr(bool) => Right(TypeAst.TypeExpr.TyBooleanExpr(bool,FLBoolean))
-		case _ => Left("Syntax Error.")
+		case _ => Left("Assigning a value can't be used as an expression.")
 	} 
 
 	def typeBexp(bexp: Ast.Bexp, symT: SymbolTable) : Either[String, TypeAst.TypeBexp.TyBop] = bexp match {

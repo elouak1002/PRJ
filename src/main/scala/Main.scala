@@ -23,7 +23,7 @@ object Main {
 		catch {case e: Exception => Left("You must enter a filename.")}
 	}
 
-	def compileProg(prog: String) : Either[String, TypeAst.TypeProg] = for {
+	def getTree(prog: String) : Either[String, TypeAst.TypeProg] = for {
 		tree <- ProgParser.parseProg(prog)
 		typeTree <- ProgTyper.typeProg(tree)
 		desugaredTree = DesugarProg.desugarProg(typeTree)
@@ -39,7 +39,7 @@ object Main {
 	def main(args: Array[String]) : Unit = {
 
 		val progString: IO[Either[String,TypeAst.TypeProg]] = getProgString(args).map({
-			case Right(progStr) => compileProg(progStr)
+			case Right(progStr) => getTree(progStr)
 			case Left(error) => Left(error)
 		})
 
