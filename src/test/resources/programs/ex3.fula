@@ -1,7 +1,16 @@
-def test(x: Int): Int = {
-	val a: Int = 10;
+def test(x: Unit): Unit = {
+	val a: Unit = if (10==10) {
+		val b: Unit = println(10);
+		b;
+		a;
+	} else {
+		val a: Unit = println(10);
+		a;
+		a;
+	};
+	val b: Int = 10;
 };
 
 def main(): Unit = {
-	println(test(10));
+	println(10);
 };

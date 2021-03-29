@@ -45,10 +45,10 @@ object DesugarExpr {
 	}
 
 	def desugarVal(expr: TypeAst.TypeExpr.TyVal, nameMap: NameMapper) : (TypeAst.TypeExpr.TyVal,NameMapper) = expr match {
-		case TypeAst.TypeExpr.TyVal(name, expr, typ) => {
+		case TypeAst.TypeExpr.TyVal(name, expr, typExpr, typ) => {
 			val (m0,dName) = nameMap.addName(name)
 			val (dExpr,m1) = desugarExpr(expr,m0)
-			(TypeAst.TypeExpr.TyVal(dName,dExpr,typ),m1)
+			(TypeAst.TypeExpr.TyVal(dName, dExpr,typExpr, typ),m1)
 		}
 	}
 

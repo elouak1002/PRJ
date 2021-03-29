@@ -18,7 +18,7 @@ object ExprTyper {
 			tyExpr <- typeExpr(expr,symT)
 			valType <- typeEqual(createSingleType(typ),getNodeType(tyExpr))
 			newSymT <- SymbolTable.putSymbol(name, ValueSym, valType, symT)
-		} yield (TypeAst.TypeExpr.TyVal(name,tyExpr,valType),newSymT)
+		} yield (TypeAst.TypeExpr.TyVal(name,tyExpr,valType,FLUnit),newSymT)
 	}
 
 	def typeIf(ifExpr: Ast.Expr.If, symT: SymbolTable): Either[String, TypeAst.TypeExpr.TyIf] = ifExpr match {
@@ -74,8 +74,8 @@ object ExprTyper {
 		case Ast.Expr.IntExpr(num) => Right(TypeAst.TypeExpr.TyIntExpr(num,FLInt)) 
 		case Ast.Expr.DoubleExpr(num) => Right(TypeAst.TypeExpr.TyDoubleExpr(num,FLDouble))
 		case Ast.Expr.BooleanExpr(bool) => Right(TypeAst.TypeExpr.TyBooleanExpr(bool,FLBoolean))
-		case _ => Left("Assigning a value can't be used as an expression.")
-	} 
+		case _ => Left("Syntax error.")
+	}
 
 	def typeBexp(bexp: Ast.Bexp, symT: SymbolTable) : Either[String, TypeAst.TypeBexp.TyBop] = bexp match {
 		case Ast.Bexp.Bop(op,expr1,expr2) => for {

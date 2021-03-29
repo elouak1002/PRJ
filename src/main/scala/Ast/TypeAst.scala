@@ -23,7 +23,7 @@ object TypeAst {
 		case class TyDoubleExpr(d: Double, typed: FLType=FLDouble) extends TypeExpr
 		case class TyBooleanExpr(b: Boolean, typed: FLType=FLBoolean) extends TypeExpr
 		case class TyAop(o: String, a1: TypeExpr, a2: TypeExpr, typed: FLType) extends TypeExpr
-		case class TyVal(name: String, e: TypeExpr, exprTyp: FLType, typed: FLUnit) extends TypeExpr
+		case class TyVal(name: String, e: TypeExpr, exprTyp: FLType, typed: FLType=FLUnit) extends TypeExpr
 	}
 	
 	sealed trait TypeDecl extends TypeAstNode
@@ -45,7 +45,7 @@ object TypeAst {
 		case TypeExpr.TyDoubleExpr(_,typ) => typ
 		case TypeExpr.TyBooleanExpr(_,typ) => typ
 		case TypeExpr.TyAop(_,_,_,typ) => typ
-		case TypeExpr.TyVal(_,_,typ) => typ
+		case TypeExpr.TyVal(_,_,_,typ) => typ
 		case TypeDecl.TyDef(_,_,_,typ) => typ
 		case TypeDecl.TyMain(_,_,typ) => typ
 	}
