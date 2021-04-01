@@ -1,16 +1,9 @@
-def test(x: Unit): Unit = {
-	val a: Unit = if (10==10) {
-		val b: Unit = println(10);
-		b;
-		a;
-	} else {
-		val a: Unit = println(10);
-		a;
-		a;
-	};
-	val b: Int = 10;
+def test(x: Int) : Int = {
+	x*2;
 };
 
 def main(): Unit = {
-	println(10);
+	val hello1: Int = 2;
+	val hello3: Int = (test(20)+test(10))+2+2*10;
+	println(hello3);
 };

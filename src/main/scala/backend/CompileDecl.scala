@@ -1,55 +1,24 @@
 package backend;
 
+import ast.TypeAst._;
 import ast.TypeAst;
+import ast._;
+import ast.FLType._;
+
+import backend.JVMOpcode._;
 
 object CompileDecl {
 
-  // def compileDef(func: TypeAst.TypeDecl.TyDef) : String = func match {
-  //   case TypeAst.TypeDecl.TyDef(name,args,body,typed) => {
-  //     functionHeader(name,typed)
-  //     local(args,body)
-  //     stackSize(args,body)
-  //     compileDeclBody(body)
-  //     compileReturn(typed)
-  //   }
-  // }
-    
-    
-  // def compileMain(main: TypeAst.TypeDecl.TyMain) : String = {
-  //   case TypeAst.TypeDecl.TyMain(name,body,typed) => 
-  // }
+  def compileDecl(decl: TypeAst.TypeDecl): JVMDecl = decl match {
+    case TypeAst.TypeDecl.TyDef(name,_,body,typed) =>  MethodDecl(name, 200, 200, typed, CompileExpr.compileDeclBody(body):+compileReturn(typed))
+    case TypeAst.TypeDecl.TyMain(_,body,_) => MainDecl(CompileExpr.compileDeclBody(body):+RETURN)
+  }
 
-  // def compileDecl(prog: TypeAst.TypeProg): List[String] = prog match {
-  //   case (func:TypeAst.TypeDecl.TyDef)::xs => compileDef(func)::compileFunctions(xs)
+  def compileReturn(typ: FLType) : Opcode = typ match {
+    case FLInt => IRETURN
+    case FLDouble => FRETURN
+    case FLUnit => RETURN
+    case FLFunc(_,funcReturnTyp) => compileReturn(funcReturnTyp)
+  }
 
-  //   case (main:TypeAst.TypeDecl.TyMain)::xs => compileMain(main)::compileFunctions(xs)
-
-  //   case Nil => List("")
-
-  // }
-  
-  // // compile functions and declarations
-  // def compile_decl(d: Decl) : String = d match {
-  	// 	case Def(name, args, a) => { 
-    // 		val env = args.zipWithIndex.toMap
-    // 		val is = "I" * args.length
-    // 		m".method public static $name($is)I" ++
-    // 		m".limit locals ${args.length}" ++
-    // 		m".limit stack ${1 + estimate_exp_stack(a)}" ++
-    // 		l"${name}_Start" ++   
-    // 		compile_exp(a, env) ++
-    // 		i"ireturn" ++
-    // 		m".end method\n"
-    // 	}
-  
-  	// 	case Main(a) => {
- 	//    		m".method public static main([Ljava/lang/String;)V" ++
-    // 		m".limit locals 1" ++
-    // 		m".limit stack ${1 + estimate_exp_stack(a)}" ++
-    // 		compile_exp(a, Map()) ++
-    // 		i"return" ++
-    // 		m".end method\n"
-  	// 	}
-	
-	// }
 }

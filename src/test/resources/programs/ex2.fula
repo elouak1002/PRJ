@@ -6,7 +6,7 @@ def fib(): Int = {
 	} 
 	else { 
 		val y: Int = 30; 
-		y; 
+		y2; 
 	};
 };
 

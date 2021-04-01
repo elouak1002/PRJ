@@ -1,13 +1,19 @@
 import ast.Ast;
 import ast.TypeAst;
+import backend.JVMOpcode;
+import backend.JVMOpcode._;
 
 import frontend.parser.ProgParser;
 import frontend.typer.ProgTyper;
+import frontend.desugar.DesugarProg;
+import backend.CompileProg;
+import backend.CompileJasmin;
 
 import cats.effect._;
-import cats.data.EitherT;
-import fastparse._
+import cats.data._;
 import scala.io.Source;
+
+import jasmin.{Main => Jasmin};
 
 object Main2 {
 
@@ -19,35 +25,51 @@ object Main2 {
 	}
 
 	def getFileName(args: Array[String]) : Either[String, String] = {
-		try { Right(args(0)) }
+		try { 
+			val filename = args(0)
+			if (filename.endsWith(".fula")) Right(filename) else Left("Error: Must be fula file.")
+		}
 		catch {case e: Exception => Left("You must enter a filename.")}
 	}
 
-	def compileProg(prog: String) : Either[String, Ast.Prog] = for {
+	def getTree(prog: String) : Either[String, TypeAst.TypeProg] = for {
 		tree <- ProgParser.parseProg(prog)
-		// typeTree <- ProgTyper.typeProg(tree)
-	} yield (tree)
+		typeTree <- ProgTyper.typeProg(tree)
+		desugaredTree = DesugarProg.desugarProg(typeTree)
+	} yield (desugaredTree)
 
-	def getProgString(args: Array[String]) : IO[Either[String,String]] = {
-		getFileName(args) match {
-			case Right(filename) => readFile(filename)
-			case Left(error) => IO{Left(error)}
-		}
+	def compileTree(tree: TypeAst.TypeProg, filename: String): String = {
+		val className = filename.replaceAll(".+/","").stripSuffix(".fula")
+		val jvmProg = CompileProg.compileProg(tree).toString().replace("XXXX",className)
+		jvmProg
 	}
 
 	def main(args: Array[String]) : Unit = {
 
-		val progString: IO[Either[String,Ast.Prog]] = getProgString(args).map({
-			case Right(progStr) => compileProg(progStr)
-			case Left(error) => Left(error)
-		})
+		val filename : Either[String,String] = getFileName(args)
 
-		val compile: IO[Unit] = progString.flatMap({
-			case Right(tree) => IO{println(tree)}
-			case Left(error) => IO{println(error)}
-		})
+		val progStr : IO[Either[String,String]] = filename match {
+			case Right(file) => readFile(file)
+			case Left(error) => IO{Left(error)}
+		}
 
-		compile.unsafeRunSync()
+		val progCompiled: IO[Either[String,String]] = progStr.map(x => for {
+			prog <- x
+			tree <- getTree(prog)
+			name <- filename
+			jvmProg = compileTree(tree,name)
+		} yield (jvmProg))
+
+
+		val compileByteCode: EitherT[IO,String,Unit] = for {
+			jasminProg <- EitherT(progCompiled)
+			filename <- EitherT(CompileJasmin.createTemporaryJasminFile(jasminProg))
+			_ <- EitherT(CompileJasmin.writeByteCode(filename))
+		} yield ()
+
+		compileByteCode.value.flatMap({
+			case Right(io) => IO(io)
+			case Left(error) => IO(println(error))
+		}).unsafeRunSync
 	}
-
 }

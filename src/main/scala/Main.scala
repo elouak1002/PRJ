@@ -9,6 +9,8 @@ import cats.effect._;
 import fastparse._
 import scala.io.Source;
 
+import jasmin.{Main => Jasmin};
+
 object Main {
 
 	def readFile(filename: String) : IO[Either[String,String]] = IO {
@@ -50,5 +52,4 @@ object Main {
 
 		compile.unsafeRunSync()
 	}
-
 }

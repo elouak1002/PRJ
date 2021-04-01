@@ -1,6 +1,8 @@
 package frontend.desugar;
 
-case class NameMapper(table: Map[String, String], parent: Option[NameMapper], current: Int) {
+import java.util.jar.Attributes.Name
+
+case class NameMapper(table: Map[String, String], parent: Option[NameMapper], current: Int, ifID: Int=0) {
 	def getParent(): Option[NameMapper] = parent
 	
 	def getTable(): Map[String, String] = table
@@ -10,15 +12,15 @@ case class NameMapper(table: Map[String, String], parent: Option[NameMapper], cu
 	def addName(name: String) : (NameMapper,String) = {
 		val newName: String = "_" + current.toString
 		val newRoot: Map[String, String] = table + (name -> newName)
-		(NameMapper(newRoot, parent, current+1),newName)
+		(NameMapper(newRoot, parent, current+1,ifID),newName)
 	}
 
 	def openScope() : NameMapper = {
-		NameMapper(Map(), Some(this), current)
+		NameMapper(Map(), Some(this), current, ifID)
 	}
 
 	def closeScope() : Option[NameMapper] = {
-		parent.map(p => NameMapper(p.getTable, p.getParent, current))
+		parent.map(p => NameMapper(p.getTable, p.getParent, current, ifID))
 	}
 
 	def getName(name: String) : Option[String] = getFromMap(name) match {
@@ -27,6 +29,10 @@ case class NameMapper(table: Map[String, String], parent: Option[NameMapper], cu
 			case Some(mapper) => mapper.getName(name)
 			case None => None
 		}
+	}
+
+	def newIfName() : (NameMapper,Int) = {
+		(NameMapper(table,parent,current,ifID+1),ifID)
 	}
 
 	def getFromMap(name: String) : Option[String] = {

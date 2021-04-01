@@ -4,6 +4,7 @@ scalaVersion := "2.13.1"
 
 libraryDependencies += "com.lihaoyi" %% "fastparse" % "2.2.2" 
 libraryDependencies += "com.lihaoyi" %% "ammonite-ops" % "2.3.8"
+libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.7.3"
 libraryDependencies += "org.typelevel" %% "cats-effect" % "2.3.3"
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.1.1"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5"

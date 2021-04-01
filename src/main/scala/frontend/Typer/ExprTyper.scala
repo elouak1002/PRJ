@@ -83,7 +83,7 @@ object ExprTyper {
 			tyExpr2 <- typeExpr(expr2,symT)
 			bexpType <- typeEqual(getNodeType(tyExpr1),getNodeType(tyExpr2))
 			opType <- TypeChecker.operationAllowedOnType(op, bexpType)
-		} yield (TypeAst.TypeBexp.TyBop(op,tyExpr1,tyExpr2,FLBoolean))
+		} yield (TypeAst.TypeBexp.TyBop(op,tyExpr1,tyExpr2,bexpType,FLBoolean))
 	}
 
 	def typeBlock(block: Ast.Block, symT: SymbolTable) : Either[String, TypeAst.TypeBlock] = block match {

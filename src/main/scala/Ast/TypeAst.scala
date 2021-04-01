@@ -10,12 +10,12 @@ object TypeAst {
 	// A boolean expression
 	sealed trait TypeBexp extends TypeAstNode
 	object TypeBexp {
-		case class TyBop(o: String, a1: TypeExpr, a2: TypeExpr, typed: FLType=FLBoolean) extends TypeBexp
+		case class TyBop(o: String, a1: TypeExpr, a2: TypeExpr, exprTyp: FLType, typed: FLType=FLBoolean) extends TypeBexp
 	}
 
 	sealed trait TypeExpr extends TypeAstNode
 	object TypeExpr {
-		case class TyIf(a: TypeBexp, e1: TypeBlock, e2: TypeBlock, typed: FLType) extends TypeExpr
+		case class TyIf(a: TypeBexp, e1: TypeBlock, e2: TypeBlock, typed: FLType, ifID: Int=(-1)) extends TypeExpr
 		case class TyAssign(name: String, args: Seq[TypeExpr], typed: FLType) extends TypeExpr
 		case class TyValue(s: String, typed: FLType) extends TypeExpr
 		case class TyWrite(e: TypeExpr, typed: FLType=FLUnit) extends TypeExpr
@@ -36,8 +36,8 @@ object TypeAst {
 
 
 	def getNodeType(node: TypeAstNode) : FLType = node match {
-		case TypeBexp.TyBop(_,_,_,typ) => typ
-		case TypeExpr.TyIf(_,_,_,typ) => typ
+		case TypeBexp.TyBop(_,_,_,_,typ) => typ
+		case TypeExpr.TyIf(_,_,_,typ,_) => typ
 		case TypeExpr.TyAssign(_,_,typ) => typ
 		case TypeExpr.TyValue(_,typ) => typ
 		case TypeExpr.TyWrite(_,typ) => typ

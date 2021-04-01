@@ -35,7 +35,7 @@ object Expressions {
 	// aexp 
 	def aexp[_ : P] : P[Ast.Expr] = P (chainA(factor,op("+")|op("-")))
 	def factor[_ : P] : P[Ast.Expr] = P (chainA(atom,op("*")|op("%")|op("/")))
-	def atom[_ : P] : P[Ast.Expr] = P ( double | value | int | aexp_paren )
+	def atom[_ : P] : P[Ast.Expr] = P ( assign_expr| aexp_paren | value | double | int )
 
 	// Helper for chaining expr into a seq of expr
 	def semi_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(1,";"))
@@ -60,7 +60,7 @@ object Expressions {
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
 	// An assignable to a singleton value expression
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | assign_expr | aexp | double | boolean | value | int )
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | aexp | assign_expr | double | boolean | value | int )
 
 	// An expression that can appear on a block
 	def block_expr[_ : P]: P[Ast.Expr] = P ( val_expr | expr )

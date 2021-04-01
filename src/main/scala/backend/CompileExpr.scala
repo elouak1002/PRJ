@@ -1,147 +1,121 @@
 package backend;
 
-import ast.TypeAst;
-import cats.data.State;
+import ast._;
+import ast.FLType._;
 
-case class Label(number: Int) {
-	def next = Label(number+1)
-}
+import ast.TypeAst._;
+import ast.TypeAst;
+
+// import cats.data.State;
+import backend.JVMOpcode._;
 
 object CompileExpr {
 
-	// val nextLabel : State[Label, Int] = State(label => (label.next, label.number))
+	def compileAexpOperator(op: String, typ: FLType): Opcode = (op,typ) match {
+		case ("+",FLInt) => IADD
+		case ("-",FLInt) => ISUB
+		case ("/",FLInt) => IDIV
+		case ("%",FLInt) => IREM
+		case ("*",FLInt) => IMUL
+		case ("+",FLDouble) => FADD
+		case ("-",FLDouble) => FSUB
+		case ("/",FLDouble) => FDIV
+		case ("%",FLDouble) => FREM
+		case ("*",FLDouble) => FMUL
+	}
 
-	// def compileIf(expr: TypeAst.TypeExpr.TyIf, nameMap: NameMapper) : (TypeAst.TypeExpr.TyIf,NameMapper) = expr match {
-	// 	case TypeAst.TypeExpr.TyIf(bexp, b1, b2, typ) => {
-	// 		val (dBexp,m0) = compileBexp(bexp,nameMap)
-	// 		val (dB1,m1) = compileBlock(b1,m0)
-	// 		val (dB2,m2) = compileBlock(b2,m1)
-	// 		(TypeAst.TypeExpr.TyIf(dBexp, dB1, dB2,typ),m2)
-	// 	}
-	// }
+	def compileBexpOperator(op: String, typ: FLType, label: String): JVMBlock = {
+		val firstOpcode: Opcode = typ match {
+			case FLInt => ISUB
+			case FLDouble => FCMPL
+		}
+		val secondOpcode: Opcode = op match {
+			case "==" => IFNE(LabelRef(label))
+			case "!=" => IFEQ(LabelRef(label))
+			case "<" => IFGE(LabelRef(label))
+			case "<=" => IFGT(LabelRef(label))
+		}
+		Seq(firstOpcode,secondOpcode)
+	}
 
-	// def compileAssign(expr: TypeAst.TypeExpr.TyAssign, nameMap: NameMapper) : (TypeAst.TypeExpr.TyAssign,NameMapper) = expr match {
-	// 	case TypeAst.TypeExpr.TyAssign(name, args, typ) => {
-	// 		val	(dArgs,m0) = compileExprList(args,nameMap)
-	// 		(TypeAst.TypeExpr.TyAssign(name,dArgs,typ),m0)
-	// 	}
-	// }
+	def compileIf(expr: TypeAst.TypeExpr.TyIf) : JVMBlock = expr match {
+		case TypeAst.TypeExpr.TyIf(bexp, b1, b2, typ,ifID) => {
+			val label1 = JVMLabel("if_" + ifID.toString)
+			val label2 = JVMLabel("else_" + ifID.toString)
+			val jvmBexp = compileBexp(bexp, "else_" + ifID.toString)
+			val jvmBlock1 = compileBlock(b1)
+			val jvmBlock2 = compileBlock(b2)
+			jvmBexp++:jvmBlock1++:Seq(GOTO(LabelRef("if_" + ifID.toString)),label2)++:jvmBlock2++:Seq(label1)
+		}
+	}
 
-	// def compileWrite(expr: TypeAst.TypeExpr.TyWrite, nameMap: NameMapper) : (TypeAst.TypeExpr.TyWrite,NameMapper) = expr match {
-	// 	case TypeAst.TypeExpr.TyWrite(e, typ) => {
-	// 		val (dExpr,m0) = compileExpr(e,nameMap)
-	// 		(TypeAst.TypeExpr.TyWrite(dExpr,typ),m0)
-	// 	}
-	// }
-
-	// def compileAop(expr: TypeAst.TypeExpr.TyAop, nameMap: NameMapper) : (TypeAst.TypeExpr.TyAop,NameMapper) = expr match {
-	// 	case TypeAst.TypeExpr.TyAop(op, aexp1, aexp2, typ) => {
-	// 		val (dAexp1,m0) = compileExpr(aexp1,nameMap)
-	// 		val (dAexp2,m1) = compileExpr(aexp2,m0)
-	// 		(TypeAst.TypeExpr.TyAop(op,dAexp1,dAexp2,typ),m1)
-	// 	}
-	// }
-
-	// def compileValue(expr: TypeAst.TypeExpr.TyValue, nameMap: NameMapper) : (TypeAst.TypeExpr.TyValue,NameMapper) = expr match {
-	// 	case TypeAst.TypeExpr.TyValue(str, typ) => {
-	// 		val dStr: Option[String] = nameMap.getName(str)
-	// 		(TypeAst.TypeExpr.TyValue(dStr.get,typ),nameMap)
-	// 	}	
-	// }
-
-	// def compileVal(expr: TypeAst.TypeExpr.TyVal, nameMap: NameMapper) : (TypeAst.TypeExpr.TyVal,NameMapper) = expr match {
-	// 	case TypeAst.TypeExpr.TyVal(name, expr, typ) => {
-	// 		val (m0,dName) = nameMap.addName(name)
-	// 		val (dExpr,m1) = compileExpr(expr,m0)
-	// 		(TypeAst.TypeExpr.TyVal(dName,dExpr,typ),m1)
-	// 	}
-	// }
-
-	// def compileBexp(bexp: TypeAst.TypeBexp, nameMap: NameMapper) : (TypeAst.TypeBexp.TyBop,NameMapper) = bexp match {
-	// 	case TypeAst.TypeBexp.TyBop(op, aexp1, aexp2, typ) =>
-	// 		val (dAexp1,m0) = compileExpr(aexp1,nameMap)
-	// 		val (dAexp2,m1) = compileExpr(aexp2,m0)
-	// 		(TypeAst.TypeBexp.TyBop(op, dAexp1, dAexp2,typ),m1)
-	// }
-
-
-	// def compileExpr(expr: TypeAst.TypeExpr, nameMap: NameMapper) : (TypeAst.TypeExpr,NameMapper) = expr match {
-	// 	case expr: TypeAst.TypeExpr.TyIf => compileIf(expr,nameMap)
-	// 	case expr: TypeAst.TypeExpr.TyAssign => compileAssign(expr,nameMap)
-	// 	case expr: TypeAst.TypeExpr.TyWrite => compileWrite(expr,nameMap)
-	// 	case expr: TypeAst.TypeExpr.TyAop => compileAop(expr,nameMap)
-	// 	case expr: TypeAst.TypeExpr.TyValue => compileValue(expr,nameMap)
-	// 	case expr: TypeAst.TypeExpr.TyVal => compileVal(expr,nameMap)
-	// 	case _ => (expr,nameMap)
-	// }
-
-
-	// def compileExprList(block: TypeAst.TypeBlock, nameMap: NameMapper) : (TypeAst.TypeBlock,NameMapper) = block match {
-	// 	case expr::xs => {
-	// 		val (compileedExpr,exprMap) = compileExpr(expr,nameMap)
-	// 		val recuCall = compileExprList(xs,exprMap)
-	// 		(compileedExpr+:recuCall._1,recuCall._2)
-	// 	}
-	// 	case Nil => (List(),nameMap)
-	// }
-
-	// def compileBlock(block: TypeAst.TypeBlock, nameMap: NameMapper) : (TypeAst.TypeBlock,NameMapper) = {
-	// 	val blockMap = nameMap.openScope()
-	// 	val (compileedBlock, blockMap2) = compileExprList(block, blockMap)
-	// 	(compileedBlock,blockMap2.closeScope().get)
-	// }
-
-	// def compileDeclBody(block: TypeAst.TypeBlock, nameMap: NameMapper) : TypeAst.TypeBlock = {
-	// 	compileBlock(block,nameMap)._1
-	// }
-
-}
-	// def compile_exp(a: Expr, env: Env) : String = a match {
-		
-	// 	case Num(i) => i"ldc $i"
-		
-	// 	case Var(s) => i"iload ${env(s)}"
-		
-	// 	case Aop(op, a1, a2) => compile_exp(a1, env) ++ compile_exp(a2, env) ++ compile_op(op)
-		
-	// 	case If(b, a1, a2) => {
-	// 		val if_else = NewLabel("If_else")
-	// 		val if_end = NewLabel("If_end")
-	// 		compile_bexp(b, env, if_else) ++
-	// 		compile_exp(a1, env) ++
-	// 		i"goto $if_end" ++
-	// 		l"$if_else" ++
-	// 		compile_exp(a2, env) ++
-	// 		l"$if_end"
-	// 	}
-		
-	// 	case Call(name, args) => {
-	// 		val is = "I" * args.length
-	// 		args.map(a => compile_exp(a, env)).mkString ++
-	// 		i"invokestatic XXX/XXX/$name($is)I"
-	// 	}
-		
-	// 	case Sequence(a1, a2) => {
-	// 		compile_exp(a1, env) ++ i"pop" ++ compile_exp(a2, env)
-	// 	}
+	def compileBexp(bexp: TypeAst.TypeBexp, label: String) : JVMBlock = bexp match {
+		case TypeAst.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ) =>
+			val jvmAexp1 = compileExpr(aexp1) 
+			val jvmAexp2 = compileExpr(aexp2)
+			val jvmBexp = compileBexpOperator(op,exprTyp,label)
+			jvmAexp1++:jvmAexp2++:jvmBexp
+	}
 	
-	// 	case Write(a1) => {
-	// 		compile_exp(a1, env) ++
-	// 		i"dup" ++
-	// 		i"invokestatic XXX/XXX/write(I)V"
-	// 	}
-	// }
+	def compileAop(expr: TypeAst.TypeExpr.TyAop) : JVMBlock = expr match {
+		case TypeAst.TypeExpr.TyAop(op, aexp1, aexp2, typ) => {
+			val jvmAexp1 = compileExpr(aexp1) 
+			val jvmAexp2 = compileExpr(aexp2)
+			val jvmOp = compileAexpOperator(op,typ)
+			jvmAexp1++:jvmAexp2:+jvmOp
+		}
+	}
 
 
+	def compileAssign(expr: TypeAst.TypeExpr.TyAssign) : JVMBlock = expr match {
+		case TypeAst.TypeExpr.TyAssign(name, args, typ) => {
+			compileBlock(args):+INVOKESTATIC(MethodCall(name, FLFunc(args.map(expr => getNodeType(expr)),typ)))
+		}
+	}
 
-	// // compile boolean expressions
-	// def compile_bexp(b: BExp, env : Env, jmp: String) : String = b match {
-  	// 	case Bop("==", a1, a2) => 
-    // 		compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpne $jmp"
-  	// 	case Bop("!=", a1, a2) => 
-    // 		compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpeq $jmp"
-	// 	case Bop("<", a1, a2) => 
-    // 		compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpge $jmp"
-  	// 	case Bop("<=", a1, a2) => 
-    // 		compile_exp(a1, env) ++ compile_exp(a2, env) ++ i"if_icmpgt $jmp"
-	// }
+	def compileWrite(expr: TypeAst.TypeExpr.TyWrite) : JVMBlock = expr match {
+		case TypeAst.TypeExpr.TyWrite(e, typ) => {
+			val printMethod: Opcode = if (getNodeType(e)==FLInt) INVOKESTATIC(MethodCall("printInt", FLFunc(Seq(FLInt),FLUnit))) else INVOKESTATIC(MethodCall("printDouble", FLFunc(Seq(FLDouble),FLUnit)))
+			compileExpr(e):+printMethod
+		}
+	}
+
+
+	def compileValue(expr: TypeAst.TypeExpr.TyValue) : JVMBlock = expr match {
+		case TypeAst.TypeExpr.TyValue(str, typ) => typ match {
+			case FLInt => Seq(ILOAD(Address(nameToAddress(str))))
+			case FLDouble => Seq(FLOAD(Address(nameToAddress(str))))
+			case FLUnit => Seq()
+		}	
+	}
+
+	def compileVal(expr: TypeAst.TypeExpr.TyVal) : JVMBlock = expr match {
+		case TypeAst.TypeExpr.TyVal(name, expr, exprTyp, typ) => exprTyp match {
+			case FLInt => compileExpr(expr):+ISTORE(Address(nameToAddress(name)))
+			case FLDouble => compileExpr(expr):+FSTORE(Address(nameToAddress(name)))
+			case FLUnit => compileExpr(expr)
+		}
+	}
+
+
+	def compileExpr(expr: TypeAst.TypeExpr) : JVMBlock = expr match {
+		case expr: TypeAst.TypeExpr.TyIf => compileIf(expr)
+		case expr: TypeAst.TypeExpr.TyAssign => compileAssign(expr)
+		case expr: TypeAst.TypeExpr.TyWrite => compileWrite(expr)
+		case expr: TypeAst.TypeExpr.TyAop => compileAop(expr)
+		case expr: TypeAst.TypeExpr.TyValue => compileValue(expr)
+		case expr: TypeAst.TypeExpr.TyVal => compileVal(expr)
+		case TypeAst.TypeExpr.TyDoubleExpr(num,typ) => Seq(LDC(Value(num.toString())))
+		case TypeAst.TypeExpr.TyIntExpr(num,typ) => Seq(LDC(Value(num.toString())))
+		case _ => Seq()
+	}
+
+	def compileBlock(block: TypeAst.TypeBlock) : JVMBlock = block match {
+		case expr::xs => compileExpr(expr)++:compileDeclBody(xs)
+		case Nil => List()
+	}
+
+	def compileDeclBody(block: TypeAst.TypeBlock) : JVMBlock = {
+		compileBlock(block)
+	}
+}
