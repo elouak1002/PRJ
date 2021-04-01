@@ -10,13 +10,15 @@ import fastparse.MultiLineWhitespace._
 object Expressions {
 	
 	// helpers for bexp
-	def eq[_ : P] : P[Ast.Bexp] =  P(aexp ~ "==" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("==", x, z)} 
-	def diff[_ : P] : P[Ast.Bexp] =  P(aexp ~ "!=" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("!=", x, z)} 
-	def lt[_ : P] : P[Ast.Bexp] =  P(aexp ~ "<" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<", x, z)} 
-	def lte[_ : P] : P[Ast.Bexp] =  P(aexp ~ "<=" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<=", x, z)} 
-	def gt[_ : P] : P[Ast.Bexp] =  P(aexp ~ ">" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<", z, x)} 
-	def gte[_ : P] : P[Ast.Bexp] =  P(aexp ~ ">=" ~ aexp).map{ case (x, z) => Ast.Bexp.Bop("<=", z, x)} 
+	def eq[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "==" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("==", x, z)} 
+	def diff[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "!=" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("!=", x, z)} 
+	def lt[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "<" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<", x, z)} 
+	def lte[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "<=" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<=", x, z)} 
+	def gt[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ ">" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<", z, x)} 
+	def gte[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ ">=" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<=", z, x)} 
 	def bexp_paren[_ : P] : P[Ast.Bexp] = P( "(" ~ bexp ~ ")" )
+
+	def atom_bexp[_ : P] : P[Ast.Expr] = P ( aexp | boolean )
 
 	// bexp
 	def bexp[_ : P]: P[Ast.Bexp] = 	P( eq | diff | lt | lte | gt | gte | bexp_paren )

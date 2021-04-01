@@ -9,7 +9,7 @@ import fastparse.MultiLineWhitespace._
   */
 object Lexicals {
 
- 	val keywordList: Set[String] = Set("if", "else", "def", "main", "val", "println", "true", "false")
+ 	val keywordList: Set[String] = Set("if", "else", "def", "main", "val", "println", "True", "False")
 
 	 // Tokens
 	def lowercase [_ : P] : P[String] = P( CharIn("a-z") ).!
@@ -28,7 +28,7 @@ object Lexicals {
 	// A double
 	def Double[_ : P] : P[Ast.Tok.DoubleTok] = P (  IntegerStr ~ "." ~ unsignedIntegerStr ).!.map(_.toDouble).map{ case num => Ast.Tok.DoubleTok(num)}
 	// A type
-	def Type[_ : P] : P[Ast.Tok.Type] =  P( ("Int" | "Double" | "Unit")).!.map{ case (typ) => Ast.Tok.Type(typ) }
+	def Type[_ : P] : P[Ast.Tok.Type] =  P( ("Int" | "Double" | "Unit" | "Boolean")).!.map{ case (typ) => Ast.Tok.Type(typ) }
 	// An identifier (name of function, name of value)
 	def Identifier[_ : P]: P[Ast.Tok.Identifier] = P( letter ~ (letter | digit | "_").repX).!.filter(!keywordList.contains(_)).map{ case iden => Ast.Tok.Identifier(iden)}
 	
