@@ -71,19 +71,20 @@ object ExprTyper {
 		case expr: Ast.Expr.Write => typeWrite(expr,symT)
 		case expr: Ast.Expr.Aop => typeAop(expr,symT)
 		case expr: Ast.Expr.Value => typeValue(expr,symT)
+		case expr: Ast.Expr.Bexp.Bop => typeBexp(expr,symT)
 		case Ast.Expr.IntExpr(num) => Right(TypeAst.TypeExpr.TyIntExpr(num,FLInt)) 
 		case Ast.Expr.DoubleExpr(num) => Right(TypeAst.TypeExpr.TyDoubleExpr(num,FLDouble))
 		case Ast.Expr.BooleanExpr(bool) => Right(TypeAst.TypeExpr.TyBooleanExpr(bool,FLBoolean))
 		case _ => Left("Syntax error.")
 	}
 
-	def typeBexp(bexp: Ast.Bexp, symT: SymbolTable) : Either[String, TypeAst.TypeBexp.TyBop] = bexp match {
-		case Ast.Bexp.Bop(op,expr1,expr2) => for {
+	def typeBexp(bexp: Ast.Expr.Bexp, symT: SymbolTable) : Either[String, TypeAst.TypeExpr.TypeBexp.TyBop] = bexp match {
+		case Ast.Expr.Bexp.Bop(op,expr1,expr2) => for {
 			tyExpr1 <- typeExpr(expr1,symT)
 			tyExpr2 <- typeExpr(expr2,symT)
 			bexpType <- typeEqual(getNodeType(tyExpr1),getNodeType(tyExpr2))
 			opType <- TypeChecker.operationAllowedOnType(op, bexpType)
-		} yield (TypeAst.TypeBexp.TyBop(op,tyExpr1,tyExpr2,bexpType,FLBoolean))
+		} yield (TypeAst.TypeExpr.TypeBexp.TyBop(op,tyExpr1,tyExpr2,bexpType,FLBoolean))
 	}
 
 	def typeBlock(block: Ast.Block, symT: SymbolTable) : Either[String, TypeAst.TypeBlock] = block match {

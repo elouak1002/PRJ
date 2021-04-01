@@ -7,12 +7,6 @@ object TypeAst {
 	// A sequence of expression semi-column separated is a block
 	type TypeBlock = Seq[TypeExpr]
 	
-	// A boolean expression
-	sealed trait TypeBexp extends TypeAstNode
-	object TypeBexp {
-		case class TyBop(o: String, a1: TypeExpr, a2: TypeExpr, exprTyp: FLType, typed: FLType=FLBoolean) extends TypeBexp
-	}
-
 	sealed trait TypeExpr extends TypeAstNode
 	object TypeExpr {
 		case class TyIf(a: TypeBexp, e1: TypeBlock, e2: TypeBlock, typed: FLType, ifID: Int=(-1)) extends TypeExpr
@@ -24,8 +18,15 @@ object TypeAst {
 		case class TyBooleanExpr(b: Boolean, typed: FLType=FLBoolean) extends TypeExpr
 		case class TyAop(o: String, a1: TypeExpr, a2: TypeExpr, typed: FLType) extends TypeExpr
 		case class TyVal(name: String, e: TypeExpr, exprTyp: FLType, typed: FLType=FLUnit) extends TypeExpr
+
+
+		// A boolean expression
+		sealed trait TypeBexp extends TypeExpr
+		object TypeBexp {
+			case class TyBop(o: String, a1: TypeExpr, a2: TypeExpr, exprTyp: FLType, typed: FLType=FLBoolean) extends TypeBexp
+		}
 	}
-	
+
 	sealed trait TypeDecl extends TypeAstNode
 	object TypeDecl	{
 		case class TyDef(name: String, args: Seq[(String,String)], body: TypeBlock, typed: FLFunc) extends TypeDecl
@@ -36,7 +37,7 @@ object TypeAst {
 
 
 	def getNodeType(node: TypeAstNode) : FLType = node match {
-		case TypeBexp.TyBop(_,_,_,_,typ) => typ
+		case TypeExpr.TypeBexp.TyBop(_,_,_,_,typ) => typ
 		case TypeExpr.TyIf(_,_,_,typ,_) => typ
 		case TypeExpr.TyAssign(_,_,typ) => typ
 		case TypeExpr.TyValue(_,typ) => typ

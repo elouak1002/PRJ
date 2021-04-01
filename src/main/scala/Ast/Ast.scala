@@ -19,12 +19,6 @@ object Ast {
 
 	// A sequence of expression semi-column separated is a block
 	type Block = Seq[Expr]
-	
-	// A boolean expression
-	sealed trait Bexp extends AstNode
-	object Bexp {
-		case class Bop(o: String, a1: Expr, a2: Expr) extends Bexp
-	}
 
 	sealed trait Expr extends AstNode
 	object Expr {
@@ -37,6 +31,12 @@ object Ast {
 		case class BooleanExpr(b: Boolean) extends Expr
 		case class Aop(o: String, a1: Expr, a2: Expr) extends Expr
 		case class Val(name: String, typ: String, e: Expr) extends Expr
+
+		// A boolean expression
+		sealed trait Bexp extends Expr
+		object Bexp {
+			case class Bop(o: String, a1: Expr, a2: Expr) extends Bexp
+		}
 	}
 	
 	sealed trait Decl extends AstNode

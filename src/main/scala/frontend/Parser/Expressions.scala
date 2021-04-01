@@ -10,18 +10,18 @@ import fastparse.MultiLineWhitespace._
 object Expressions {
 	
 	// helpers for bexp
-	def eq[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "==" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("==", x, z)} 
-	def diff[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "!=" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("!=", x, z)} 
-	def lt[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "<" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<", x, z)} 
-	def lte[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ "<=" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<=", x, z)} 
-	def gt[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ ">" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<", z, x)} 
-	def gte[_ : P] : P[Ast.Bexp] =  P(atom_bexp ~ ">=" ~ atom_bexp).map{ case (x, z) => Ast.Bexp.Bop("<=", z, x)} 
-	def bexp_paren[_ : P] : P[Ast.Bexp] = P( "(" ~ bexp ~ ")" )
+	def eq[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ "==" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("==", x, z)} 
+	def diff[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ "!=" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("!=", x, z)} 
+	def lt[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ "<" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<", x, z)} 
+	def lte[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ "<=" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<=", x, z)} 
+	def gt[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ ">" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<", z, x)} 
+	def gte[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ ">=" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<=", z, x)} 
+	def bexp_paren[_ : P] : P[Ast.Expr.Bexp] = P( "(" ~ bexp ~ ")" )
 
-	def atom_bexp[_ : P] : P[Ast.Expr] = P ( aexp | boolean )
+	def atom_bexp[_ : P] : P[Ast.Expr] = P ( boolean | aexp )
 
 	// bexp
-	def bexp[_ : P]: P[Ast.Bexp] = 	P( eq | diff | lt | lte | gt | gte | bexp_paren )
+	def bexp[_ : P]: P[Ast.Expr.Bexp] = 	P( eq | diff | lt | lte | gt | gte | bexp_paren )
 
 	// parsing of integers, double, boolean and values
 	def int[_: P] : P[Ast.Expr.IntExpr] = P (Lexicals.Integer).map{ case( Ast.Tok.IntegerTok(num)) => Ast.Expr.IntExpr(num)}
@@ -62,7 +62,7 @@ object Expressions {
 	def val_expr[_ : P]: P[Ast.Expr.Val] = P ( "val" ~ Lexicals.Identifier ~ ":" ~ Lexicals.Type ~ "=" ~ expr ).map{ case(Ast.Tok.Identifier(id),Ast.Tok.Type(typ),expr) => Ast.Expr.Val(id,typ,expr) }
 
 	// An assignable to a singleton value expression
-	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | aexp | assign_expr | double | boolean | value | int )
+	def expr[_ : P]: P[Ast.Expr] = P ( if_expr | write_expr | bexp | aexp | assign_expr | double | boolean | value | int )
 
 	// An expression that can appear on a block
 	def block_expr[_ : P]: P[Ast.Expr] = P ( val_expr | expr )
@@ -71,3 +71,4 @@ object Expressions {
 	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.block_expr) ~ ";" | Expressions.block_expr.map{ case expr => List(expr) } ~ ";")
 
 }
+

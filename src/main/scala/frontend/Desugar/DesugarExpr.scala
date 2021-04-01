@@ -53,11 +53,11 @@ object DesugarExpr {
 		}
 	}
 
-	def desugarBexp(bexp: TypeAst.TypeBexp, nameMap: NameMapper) : (TypeAst.TypeBexp.TyBop,NameMapper) = bexp match {
-		case TypeAst.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ) =>
+	def desugarBexp(bexp: TypeAst.TypeExpr.TypeBexp, nameMap: NameMapper) : (TypeAst.TypeExpr.TypeBexp.TyBop,NameMapper) = bexp match {
+		case TypeAst.TypeExpr.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ) =>
 			val (dAexp1,m0) = desugarExpr(aexp1,nameMap)
 			val (dAexp2,m1) = desugarExpr(aexp2,m0)
-			(TypeAst.TypeBexp.TyBop(op, dAexp1, dAexp2,exprTyp,typ),m1)
+			(TypeAst.TypeExpr.TypeBexp.TyBop(op, dAexp1, dAexp2,exprTyp,typ),m1)
 	}
 
 
@@ -68,6 +68,7 @@ object DesugarExpr {
 		case expr: TypeAst.TypeExpr.TyAop => desugarAop(expr,nameMap)
 		case expr: TypeAst.TypeExpr.TyValue => desugarValue(expr,nameMap)
 		case expr: TypeAst.TypeExpr.TyVal => desugarVal(expr,nameMap)
+		case expr: TypeAst.TypeExpr.TypeBexp.TyBop => desugarBexp(expr,nameMap)
 		case _ => (expr,nameMap)
 	}
 
