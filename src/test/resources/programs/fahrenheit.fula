@@ -1,0 +1,7 @@
+def degreeToFahrenheit(degree: Double): Double = {
+	degree*9.0/5.0+32.0;
+};
+
+def main(): Unit = {
+	println(degreeToFahrenheit(11.256));
+};

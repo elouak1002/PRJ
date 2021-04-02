@@ -1,0 +1,20 @@
+def fibHelper(n: Int, a: Int, b: Int) : Int = {
+	if (n == 0) {
+		a;
+	}
+	else {
+		if (n == 1) {
+			b;
+		} else {
+			fibHelper(n-1,b,a+b);
+		};
+	};
+};
+
+def fib(n: Int): Int = {
+	fibHelper(n,0,1);
+};
+
+def main(): Unit = {
+	println(fib(36));
+};

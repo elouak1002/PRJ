@@ -15,7 +15,7 @@ object Expressions {
 	def lt[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ "<" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<", x, z)} 
 	def lte[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ "<=" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<=", x, z)} 
 	def gt[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ ">" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<", z, x)} 
-	def gte[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ ">=" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<=", z, x)} 
+	def gte[_ : P] : P[Ast.Expr.Bexp] =  P(atom_bexp ~ ">=" ~ atom_bexp).map{ case (x, z) => Ast.Expr.Bexp.Bop("<=", z, x)}
 	def bexp_paren[_ : P] : P[Ast.Expr.Bexp] = P( "(" ~ bexp ~ ")" )
 
 	def atom_bexp[_ : P] : P[Ast.Expr] = P ( boolean | aexp )
@@ -37,7 +37,7 @@ object Expressions {
 	// aexp 
 	def aexp[_ : P] : P[Ast.Expr] = P (chainA(factor,op("+")|op("-")))
 	def factor[_ : P] : P[Ast.Expr] = P (chainA(atom,op("*")|op("%")|op("/")))
-	def atom[_ : P] : P[Ast.Expr] = P ( assign_expr| aexp_paren | value | double | int )
+	def atom[_ : P] : P[Ast.Expr] = P ( assign_expr | aexp_paren | value | double | int )
 
 	// Helper for chaining expr into a seq of expr
 	def semi_chain[_ : P](p: => P[Ast.Expr]): P[Seq[Ast.Expr]] = P( p.rep(1,";"))
@@ -71,4 +71,3 @@ object Expressions {
 	def block[_ : P]: P[Ast.Block] = P ( Expressions.semi_chain(Expressions.block_expr) ~ ";" | Expressions.block_expr.map{ case expr => List(expr) } ~ ";")
 
 }
-

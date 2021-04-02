@@ -1,0 +1,13 @@
+def test(x: Int) : Int = {
+	val a: Int = 10;
+	val b: Boolean = (10==20)==False;
+	if (b==True) {
+		1;
+	} else {
+		2;
+	};
+};
+
+def main() : Unit = {
+	println(test(10));
+};

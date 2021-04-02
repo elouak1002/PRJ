@@ -11,7 +11,7 @@ import scala.io.Source;
 
 import jasmin.{Main => Jasmin};
 
-object Main2 {
+object OnlyParsing {
 
 	def readFile(filename: String) : IO[Either[String,String]] = IO {
 		try {
@@ -25,11 +25,11 @@ object Main2 {
 		catch {case e: Exception => Left("You must enter a filename.")}
 	}
 
-	def getTree(prog: String) : Either[String, TypeAst.TypeProg] = for {
+	def getTree(prog: String) : Either[String, Ast.Prog] = for {
 		tree <- ProgParser.parseProg(prog)
-		typeTree <- ProgTyper.typeProg(tree)
-		desugaredTree = DesugarProg.desugarProg(typeTree)
-	} yield (desugaredTree)
+		// typeTree <- ProgTyper.typeProg(tree)
+		// desugaredTree = DesugarProg.desugarProg(typeTree)
+	} yield (tree)
 
 	def getProgString(args: Array[String]) : IO[Either[String,String]] = {
 		getFileName(args) match {
@@ -40,7 +40,7 @@ object Main2 {
 
 	def main(args: Array[String]) : Unit = {
 
-		val progString: IO[Either[String,TypeAst.TypeProg]] = getProgString(args).map({
+		val progString: IO[Either[String,Ast.Prog]] = getProgString(args).map({
 			case Right(progStr) => getTree(progStr)
 			case Left(error) => Left(error)
 		})

@@ -15,7 +15,7 @@ import scala.io.Source;
 
 import jasmin.{Main => Jasmin};
 
-object Main {
+object Main3 {
 
 	def readFile(filename: String) : IO[Either[String,String]] = IO {
 		try {
@@ -61,15 +61,11 @@ object Main {
 		} yield (jvmProg))
 
 
-		val compileByteCode: EitherT[IO,String,Unit] = for {
-			jasminProg <- EitherT(progCompiled)
-			filename <- EitherT(CompileJasmin.createTemporaryJasminFile(jasminProg))
-			_ <- EitherT(CompileJasmin.writeByteCode(filename))
-		} yield ()
+		val compile: IO[Unit] = progCompiled.flatMap({
+			case Right(tree) => IO{println(tree)}
+			case Left(error) => IO{println(error)}
+		})
 
-		compileByteCode.value.flatMap({
-			case Right(io) => IO(io)
-			case Left(error) => IO(println(error))
-		}).unsafeRunSync
+		compile.unsafeRunSync()
 	}
 }

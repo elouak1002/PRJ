@@ -9,7 +9,7 @@ import fastparse.MultiLineWhitespace._
   */
 object Lexicals {
 
- 	val keywordList: Set[String] = Set("if", "else", "def", "main", "val", "println", "True", "False")
+ 	val keywordList: Set[String] = Set("if", "else", "def", "main", "val", "printlnFula", "True", "False", "printFula")
 
 	 // Tokens
 	def lowercase [_ : P] : P[String] = P( CharIn("a-z") ).!

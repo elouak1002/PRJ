@@ -11,6 +11,7 @@ object JVMOpcode {
 		case FLInt => "I"
 		case FLDouble => "F" 
 		case FLUnit => "V"
+		case FLBoolean => "Z"
 		case FLFunc(args,typ) => "(" + args.map(typeToString(_)).mkString + ")" + typeToString(typ)
 	}
 
@@ -47,19 +48,21 @@ object JVMOpcode {
 		override val method = ".method public static main([Ljava/lang/String;)V"
 	}
 
-	val printIntMethod = MethodDecl("printInt", 1,2,FLFunc(Seq(FLInt),FLUnit),Seq(
+	val printFula = (typ: FLType) => MethodDecl("printFula", 1,2,FLFunc(Seq(typ),FLUnit),Seq(
 		GETSTATIC(ClassCall("java/lang/System/out"),FieldType("Ljava/io/PrintStream;")),
-		ILOAD(Address("0")),
-		INVOKEVIRTUAL(MethodCall("java/io/PrintStream/println",FLFunc(Seq(FLInt),FLUnit),"")),
+		if (typ==FLDouble) FLOAD(Address("0")) else ILOAD(Address("0")),
+		INVOKEVIRTUAL(MethodCall("java/io/PrintStream/print",FLFunc(Seq(typ),FLUnit),"")),
 		RETURN
 	))
 
-	val printDoubleMethod = MethodDecl("printDouble", 1,2,FLFunc(Seq(FLDouble),FLUnit),Seq(
+	val printlnFula = (typ: FLType) => MethodDecl("printlnFula", 1,2,FLFunc(Seq(typ),FLUnit),Seq(
 		GETSTATIC(ClassCall("java/lang/System/out"),FieldType("Ljava/io/PrintStream;")),
-		FLOAD(Address("0")),
-		INVOKEVIRTUAL(MethodCall("java/io/PrintStream/println",FLFunc(Seq(FLDouble),FLUnit),"")),
+		if (typ==FLDouble) FLOAD(Address("0")) else ILOAD(Address("0")),
+		INVOKEVIRTUAL(MethodCall("java/io/PrintStream/println",FLFunc(Seq(typ),FLUnit),"")),
 		RETURN
 	))
+
+	val utils: JVMProgCore = Seq(FLInt, FLDouble, FLBoolean).flatMap(typ => Seq(printFula(typ),printlnFula(typ)))
 
 	trait Opcode
 

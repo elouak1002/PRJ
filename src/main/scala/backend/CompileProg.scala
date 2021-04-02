@@ -7,7 +7,7 @@ import ast.TypeAst;
 object CompileProg {
 	
 	def compileProg(prog: TypeAst.TypeProg): JVMProg = {
-		val funcJ: JVMProgCore = Seq(printIntMethod,printDoubleMethod) ++: prog.map(decl => CompileDecl.compileDecl(decl))
+		val funcJ: JVMProgCore = JVMOpcode.utils ++: prog.map(decl => CompileDecl.compileDecl(decl))
 		val headerJ: JVMProgHeader = JVMOpcode.header("XXXX")
 		JVMProg(headerJ, funcJ)
 	}

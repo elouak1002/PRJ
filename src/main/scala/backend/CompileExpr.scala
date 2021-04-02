@@ -11,49 +11,70 @@ import backend.JVMOpcode._;
 
 object CompileExpr {
 
-	def compileAexpOperator(op: String, typ: FLType): Opcode = (op,typ) match {
-		case ("+",FLInt) => IADD
-		case ("-",FLInt) => ISUB
-		case ("/",FLInt) => IDIV
-		case ("%",FLInt) => IREM
-		case ("*",FLInt) => IMUL
-		case ("+",FLDouble) => FADD
-		case ("-",FLDouble) => FSUB
-		case ("/",FLDouble) => FDIV
-		case ("%",FLDouble) => FREM
-		case ("*",FLDouble) => FMUL
+	def compileAexpOperator(op: String, typ: FLType): JVMBlock = (op,typ) match {
+		case ("+",FLInt) => Seq(IADD)
+		case ("-",FLInt) => Seq(ISUB)
+		case ("/",FLInt) => Seq(IDIV)
+		case ("%",FLInt) => Seq(IREM)
+		case ("*",FLInt) => Seq(IMUL)
+		case ("+",FLDouble) => Seq(FADD)
+		case ("-",FLDouble) => Seq(FSUB)
+		case ("/",FLDouble) => Seq(FDIV)
+		case ("%",FLDouble) => Seq(FREM)
+		case ("*",FLDouble) => Seq(FMUL)
+		case (_,_) => Seq()
 	}
 
 	def compileBexpOperator(op: String, typ: FLType, label: String): JVMBlock = {
 		val firstOpcode: Opcode = typ match {
-			case FLInt => ISUB
+			case FLInt|FLBoolean => ISUB
 			case FLDouble => FCMPL
 		}
+
+		val labelFalseName = "bexp_"+label+"_false"
+		val labelFalse = JVMLabel(labelFalseName)
+		val labelRefFalse = LabelRef(labelFalseName)
+		
+		val labelEndName = "bexp_"+label+"_end"
+		val labelEnd = JVMLabel(labelEndName)
+		val labelRefEnd = LabelRef(labelEndName)
+
 		val secondOpcode: Opcode = op match {
-			case "==" => IFNE(LabelRef(label))
-			case "!=" => IFEQ(LabelRef(label))
-			case "<" => IFGE(LabelRef(label))
-			case "<=" => IFGT(LabelRef(label))
+			case "==" => IFNE(labelRefFalse)
+			case "!=" => IFEQ(labelRefFalse)
+			case "<" => IFGE(labelRefFalse)
+			case "<=" => IFGT(labelRefFalse)
 		}
-		Seq(firstOpcode,secondOpcode)
+
+		val evalBexp: JVMBlock = Seq(LDC(Value("1")),GOTO(labelRefEnd),labelFalse,LDC(Value("0")),labelEnd)
+		Seq(firstOpcode,secondOpcode)++:evalBexp
 	}
 
 	def compileIf(expr: TypeAst.TypeExpr.TyIf) : JVMBlock = expr match {
-		case TypeAst.TypeExpr.TyIf(bexp, b1, b2, typ,ifID) => {
-			val label1 = JVMLabel("if_" + ifID.toString)
-			val label2 = JVMLabel("else_" + ifID.toString)
-			val jvmBexp = compileBexp(bexp, "else_" + ifID.toString)
+		case TypeAst.TypeExpr.TyIf(bexp, b1, b2, typ,labelID) => {
+			
+			val labelFalseName = "bexp_"+labelID.toString()+"_false"
+			val labelFalse = JVMLabel(labelFalseName)
+			val labelRefFalse = LabelRef(labelFalseName)
+			
+			val labelEndName = "bexp_"+labelID.toString()+"_end"
+			val labelEnd = JVMLabel(labelEndName)
+			val labelRefEnd = LabelRef(labelEndName)
+
+			val jvmBexp = compileBexp(bexp)
+
 			val jvmBlock1 = compileBlock(b1)
 			val jvmBlock2 = compileBlock(b2)
-			jvmBexp++:jvmBlock1++:Seq(GOTO(LabelRef("if_" + ifID.toString)),label2)++:jvmBlock2++:Seq(label1)
+
+			jvmBexp++:Seq(IFEQ(labelRefFalse))++:jvmBlock1++:Seq(GOTO(labelRefEnd),labelFalse)++:jvmBlock2++:Seq(labelEnd)
 		}
 	}
 
-	def compileBexp(bexp: TypeAst.TypeBexp, label: String) : JVMBlock = bexp match {
-		case TypeAst.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ) =>
+	def compileBexp(bexp: TypeAst.TypeExpr.TypeBexp) : JVMBlock = bexp match {
+		case TypeAst.TypeExpr.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ,labelID) =>
 			val jvmAexp1 = compileExpr(aexp1) 
 			val jvmAexp2 = compileExpr(aexp2)
-			val jvmBexp = compileBexpOperator(op,exprTyp,label)
+			val jvmBexp = compileBexpOperator(op,exprTyp,labelID.toString())
 			jvmAexp1++:jvmAexp2++:jvmBexp
 	}
 	
@@ -62,7 +83,7 @@ object CompileExpr {
 			val jvmAexp1 = compileExpr(aexp1) 
 			val jvmAexp2 = compileExpr(aexp2)
 			val jvmOp = compileAexpOperator(op,typ)
-			jvmAexp1++:jvmAexp2:+jvmOp
+			jvmAexp1++:jvmAexp2++:jvmOp
 		}
 	}
 
@@ -74,16 +95,16 @@ object CompileExpr {
 	}
 
 	def compileWrite(expr: TypeAst.TypeExpr.TyWrite) : JVMBlock = expr match {
-		case TypeAst.TypeExpr.TyWrite(e, typ) => {
-			val printMethod: Opcode = if (getNodeType(e)==FLInt) INVOKESTATIC(MethodCall("printInt", FLFunc(Seq(FLInt),FLUnit))) else INVOKESTATIC(MethodCall("printDouble", FLFunc(Seq(FLDouble),FLUnit)))
-			compileExpr(e):+printMethod
+		case TypeAst.TypeExpr.TyWrite(e, typ) => getNodeType(e) match {
+			case FLUnit|FLFunc(_,_) =>  Seq()
+			case _ => compileExpr(e):+INVOKESTATIC(MethodCall("printlnFula", FLFunc(Seq(getNodeType(e)),FLUnit)))
 		}
 	}
 
 
 	def compileValue(expr: TypeAst.TypeExpr.TyValue) : JVMBlock = expr match {
 		case TypeAst.TypeExpr.TyValue(str, typ) => typ match {
-			case FLInt => Seq(ILOAD(Address(nameToAddress(str))))
+			case FLInt|FLBoolean => Seq(ILOAD(Address(nameToAddress(str))))
 			case FLDouble => Seq(FLOAD(Address(nameToAddress(str))))
 			case FLUnit => Seq()
 		}	
@@ -91,7 +112,7 @@ object CompileExpr {
 
 	def compileVal(expr: TypeAst.TypeExpr.TyVal) : JVMBlock = expr match {
 		case TypeAst.TypeExpr.TyVal(name, expr, exprTyp, typ) => exprTyp match {
-			case FLInt => compileExpr(expr):+ISTORE(Address(nameToAddress(name)))
+			case FLInt|FLBoolean => compileExpr(expr):+ISTORE(Address(nameToAddress(name)))
 			case FLDouble => compileExpr(expr):+FSTORE(Address(nameToAddress(name)))
 			case FLUnit => compileExpr(expr)
 		}
@@ -105,9 +126,10 @@ object CompileExpr {
 		case expr: TypeAst.TypeExpr.TyAop => compileAop(expr)
 		case expr: TypeAst.TypeExpr.TyValue => compileValue(expr)
 		case expr: TypeAst.TypeExpr.TyVal => compileVal(expr)
+		case expr: TypeAst.TypeExpr.TypeBexp.TyBop => compileBexp(expr)
 		case TypeAst.TypeExpr.TyDoubleExpr(num,typ) => Seq(LDC(Value(num.toString())))
 		case TypeAst.TypeExpr.TyIntExpr(num,typ) => Seq(LDC(Value(num.toString())))
-		case _ => Seq()
+		case TypeAst.TypeExpr.TyBooleanExpr(bool,typ) => if (bool) Seq(LDC(Value("1"))) else Seq(LDC(Value("0")))
 	}
 
 	def compileBlock(block: TypeAst.TypeBlock) : JVMBlock = block match {

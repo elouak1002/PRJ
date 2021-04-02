@@ -11,8 +11,8 @@ object DesugarExpr {
 			val (dBexp,m0) = desugarBexp(bexp,nameMap)
 			val (dB1,m1) = desugarBlock(b1,m0)
 			val (dB2,m2) = desugarBlock(b2,m1)
-			val (m3,ifID) = nameMap.newIfName
-			(TypeAst.TypeExpr.TyIf(dBexp, dB1, dB2,typ,ifID),m3)
+			val (m3,labelID) = m2.newLabelID
+			(TypeAst.TypeExpr.TyIf(dBexp, dB1, dB2,typ,labelID),m3)
 		}
 	}
 
@@ -54,10 +54,11 @@ object DesugarExpr {
 	}
 
 	def desugarBexp(bexp: TypeAst.TypeExpr.TypeBexp, nameMap: NameMapper) : (TypeAst.TypeExpr.TypeBexp.TyBop,NameMapper) = bexp match {
-		case TypeAst.TypeExpr.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ) =>
+		case TypeAst.TypeExpr.TypeBexp.TyBop(op, aexp1, aexp2, exprTyp, typ,_) =>
 			val (dAexp1,m0) = desugarExpr(aexp1,nameMap)
 			val (dAexp2,m1) = desugarExpr(aexp2,m0)
-			(TypeAst.TypeExpr.TypeBexp.TyBop(op, dAexp1, dAexp2,exprTyp,typ),m1)
+			val (m2,labelID) = m1.newLabelID
+			(TypeAst.TypeExpr.TypeBexp.TyBop(op, dAexp1, dAexp2,exprTyp,typ,labelID),m2)
 	}
 
 
@@ -92,4 +93,3 @@ object DesugarExpr {
 		desugarBlock(block,nameMap)._1
 	}
 }
-
