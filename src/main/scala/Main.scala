@@ -5,7 +5,7 @@ import backend.JVMOpcode._;
 
 import frontend.parser.ProgParser;
 import frontend.typer.ProgTyper;
-import frontend.desugar.DesugarProg;
+import frontend.mangler.MangleProg;
 import backend.CompileProg;
 import backend.CompileJasmin;
 
@@ -35,8 +35,8 @@ object Main {
 	def getTree(prog: String) : Either[String, TypeAst.TypeProg] = for {
 		tree <- ProgParser.parseProg(prog)
 		typeTree <- ProgTyper.typeProg(tree)
-		desugaredTree = DesugarProg.desugarProg(typeTree)
-	} yield (desugaredTree)
+		mangledTree = MangleProg.mangleProg(typeTree)
+	} yield (mangledTree)
 
 	def compileTree(tree: TypeAst.TypeProg, filename: String): String = {
 		val className = filename.replaceAll(".+/","").stripSuffix(".fula")

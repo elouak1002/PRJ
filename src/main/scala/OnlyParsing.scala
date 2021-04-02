@@ -3,7 +3,7 @@ import ast.TypeAst;
 
 import frontend.parser.ProgParser;
 import frontend.typer.ProgTyper;
-import frontend.desugar.DesugarProg;
+import frontend.mangler.MangleProg;
 
 import cats.effect._;
 import fastparse._
@@ -27,8 +27,6 @@ object OnlyParsing {
 
 	def getTree(prog: String) : Either[String, Ast.Prog] = for {
 		tree <- ProgParser.parseProg(prog)
-		// typeTree <- ProgTyper.typeProg(tree)
-		// desugaredTree = DesugarProg.desugarProg(typeTree)
 	} yield (tree)
 
 	def getProgString(args: Array[String]) : IO[Either[String,String]] = {

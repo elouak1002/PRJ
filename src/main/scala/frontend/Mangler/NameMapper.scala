@@ -1,4 +1,4 @@
-package frontend.desugar;
+package frontend.mangler;
 
 case class NameMapper(table: Map[String, String], parent: Option[NameMapper], current: Int, labelID: Int=0) {
 	def getParent(): Option[NameMapper] = parent
