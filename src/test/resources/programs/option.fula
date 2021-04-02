@@ -1,0 +1,8 @@
+def test(opt: Int): Int = {
+	val t: Int = 20;	
+	20.02;
+};
+
+def main(): Unit = {
+	println(10);
+};

@@ -28,6 +28,7 @@ object Expressions {
 	def double[_: P] : P[Ast.Expr.DoubleExpr] = P (Lexicals.Double).map{ case( Ast.Tok.DoubleTok(num)) => Ast.Expr.DoubleExpr(num)}
 	def boolean[_ : P] : P[Ast.Expr.BooleanExpr] = P(Lexicals.Boolean).map{ case( Ast.Tok.BooleanTok(bool)) => Ast.Expr.BooleanExpr(bool)}
 	def value[_ : P] : P[Ast.Expr.Value] = P (Lexicals.Identifier).map{ case(Ast.Tok.Identifier(id)) => Ast.Expr.Value(id) }
+	// def some[_ : P] : P[Ast.Expr.Some] = P("Some(" ~ expr ~ ")").map{ case As }
 	
 	//helpers for aexp
 	def chainA[_: P](p: => P[Ast.Expr], op: => P[String]) = P( p ~ (op ~ p).rep ).map{case (lhs, rhs) =>rhs.foldLeft(lhs){case (lhs, (op, rhs)) =>Ast.Expr.Aop(op, lhs, rhs)}}
