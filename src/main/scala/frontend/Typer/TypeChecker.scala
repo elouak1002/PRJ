@@ -16,7 +16,7 @@ object TypeChecker {
 	}
 
 	def operationAllowedOnType(op: String, typ: FLType) : Either[String, FLType] = (op,typ) match {
-		case ("+"|"-"|"*"|"%"|"/"|"<"|"<="|"=="|"!=",FLInt|FLDouble) => Right(typ)
+		case ("+"|"-"|"*"|"%"|"/"|"<"|"<="|"=="|"!=",FLInt|FLFloat) => Right(typ)
 		case ("=="|"!=",FLBoolean) => Right(typ)
 		case (_,_) => Left("Operator " + op + " not allowed on type " + typ + ".")
 	}

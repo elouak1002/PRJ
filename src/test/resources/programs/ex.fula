@@ -2,7 +2,7 @@ def test10(x : Int) : Int = {
 	test10(10);
 };
 
-def test(x: Double) : Double = {
+def test(x: Float) : Float = {
 	10.02;
 };
 
@@ -17,8 +17,8 @@ def try(x: Int) : Int = {
 	x;
 };
 
-def test3(y: Int) : Double = {
-	val x: Double = if (y==20) {
+def test3(y: Int) : Float = {
+	val x: Float = if (y==20) {
 		20.02;
 	} else {
 		10.02;

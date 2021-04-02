@@ -12,7 +12,7 @@ object Ast {
 	object Tok {
 		case class Identifier(iden: String) extends Tok
 		case class IntegerTok(num: Int) extends Tok
-		case class DoubleTok(num: Double) extends Tok
+		case class FloatTok(num: Float) extends Tok
 		case class BooleanTok(num: Boolean) extends Tok
 		case class Type(typ: String) extends Tok
 	}
@@ -27,7 +27,7 @@ object Ast {
 		case class Value(s: String) extends Expr
 		case class Write(e: Expr) extends Expr
 		case class IntExpr(i: Int) extends Expr
-		case class DoubleExpr(d: Double) extends Expr
+		case class FloatExpr(d: Float) extends Expr
 		case class BooleanExpr(b: Boolean) extends Expr
 		case class Aop(o: String, a1: Expr, a2: Expr) extends Expr
 		case class Val(name: String, typ: String, e: Expr) extends Expr

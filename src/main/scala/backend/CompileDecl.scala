@@ -16,7 +16,7 @@ object CompileDecl {
 
   def compileReturn(typ: FLType) : Opcode = typ match {
     case FLInt => IRETURN
-    case FLDouble => FRETURN
+    case FLFloat => FRETURN
     case FLUnit => RETURN
     case FLFunc(_,funcReturnTyp) => compileReturn(funcReturnTyp)
   }

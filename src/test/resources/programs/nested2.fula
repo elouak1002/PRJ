@@ -1,0 +1,16 @@
+def nested2(x: Boolean, y: Boolean, z: Boolean): Int = {
+	if (x==True) {
+		val res: Int = 1; res;
+		if(y==True) {
+			val res: Int = 2; res;
+		} else {
+			val res: Int = 3; res;
+		};
+	} else {
+		val res: Int = 4; res;	
+	};
+};
+
+def main(): Unit = {
+	println(nested2(True,True,True));
+};

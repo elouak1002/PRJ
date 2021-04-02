@@ -1,4 +1,4 @@
-def degreeToFahrenheit(degree: Double): Double = {
+def degreeToFahrenheit(degree: Float): Float = {
 	degree*9.0/5.0+32.0;
 };
 

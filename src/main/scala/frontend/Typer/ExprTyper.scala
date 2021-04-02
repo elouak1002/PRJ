@@ -61,7 +61,7 @@ object ExprTyper {
 	def typeWrite(writeExpr: Ast.Expr.Write, symT: SymbolTable): Either[String, TypeAst.TypeExpr.TyWrite] = writeExpr match {
 		case Ast.Expr.Write(expr) => for {
 			tyExpr <- typeExpr(expr, symT) // type the expression.
-			_ <- if ((getNodeType(tyExpr) == FLInt) || (getNodeType(tyExpr) == FLDouble)) Right(tyExpr) else Left("Can not write a value of type " + getNodeType(tyExpr)) 
+			_ <- if ((getNodeType(tyExpr) == FLInt) || (getNodeType(tyExpr) == FLFloat)) Right(tyExpr) else Left("Can not write a value of type " + getNodeType(tyExpr)) 
 		} yield (TypeAst.TypeExpr.TyWrite(tyExpr,FLUnit)) // Writing is a unit operation.
 	}
 
@@ -73,7 +73,7 @@ object ExprTyper {
 		case expr: Ast.Expr.Value => typeValue(expr,symT)
 		case expr: Ast.Expr.Bexp.Bop => typeBexp(expr,symT)
 		case Ast.Expr.IntExpr(num) => Right(TypeAst.TypeExpr.TyIntExpr(num,FLInt)) 
-		case Ast.Expr.DoubleExpr(num) => Right(TypeAst.TypeExpr.TyDoubleExpr(num,FLDouble))
+		case Ast.Expr.FloatExpr(num) => Right(TypeAst.TypeExpr.TyFloatExpr(num,FLFloat))
 		case Ast.Expr.BooleanExpr(bool) => Right(TypeAst.TypeExpr.TyBooleanExpr(bool,FLBoolean))
 		case _ => Left("Syntax error.")
 	}

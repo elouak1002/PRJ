@@ -26,11 +26,11 @@ object Lexicals {
 	// An integer
 	def Integer[_ : P] : P[Ast.Tok.IntegerTok] = P(IntegerStr).map(_.toInt).map{ case num => Ast.Tok.IntegerTok(num)}
 	// A double
-	def Double[_ : P] : P[Ast.Tok.DoubleTok] = P (  IntegerStr ~ "." ~ unsignedIntegerStr ).!.map(_.toDouble).map{ case num => Ast.Tok.DoubleTok(num)}
+	def Float[_ : P] : P[Ast.Tok.FloatTok] = P (  IntegerStr ~ "." ~ unsignedIntegerStr ).!.map(_.toFloat).map{ case num => Ast.Tok.FloatTok(num)}
 	// A type
 
 	// def OptionType[_ : P] : P[Ast.Tok.Type] =  P( ("Option[" ~ SingleType ~ "]")).!.map{ case (typ) => Ast.Tok.Type(typ) }
-	def SingleType[_ : P] : P[Ast.Tok.Type] =  P( ("Int" | "Double" | "Unit" | "Boolean" )).!.map{ case (typ) => Ast.Tok.Type(typ) }
+	def SingleType[_ : P] : P[Ast.Tok.Type] =  P( ("Int" | "Float" | "Unit" | "Boolean" )).!.map{ case (typ) => Ast.Tok.Type(typ) }
 	def Type[_ : P] : P[Ast.Tok.Type] =  P( /*OptionType |*/ SingleType )
 
 	// An identifier (name of function, name of value)

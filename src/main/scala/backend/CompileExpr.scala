@@ -17,18 +17,18 @@ object CompileExpr {
 		case ("/",FLInt) => Seq(IDIV)
 		case ("%",FLInt) => Seq(IREM)
 		case ("*",FLInt) => Seq(IMUL)
-		case ("+",FLDouble) => Seq(FADD)
-		case ("-",FLDouble) => Seq(FSUB)
-		case ("/",FLDouble) => Seq(FDIV)
-		case ("%",FLDouble) => Seq(FREM)
-		case ("*",FLDouble) => Seq(FMUL)
+		case ("+",FLFloat) => Seq(FADD)
+		case ("-",FLFloat) => Seq(FSUB)
+		case ("/",FLFloat) => Seq(FDIV)
+		case ("%",FLFloat) => Seq(FREM)
+		case ("*",FLFloat) => Seq(FMUL)
 		case (_,_) => Seq()
 	}
 
 	def compileBexpOperator(op: String, typ: FLType, label: String): JVMBlock = {
 		val firstOpcode: Opcode = typ match {
 			case FLInt|FLBoolean => ISUB
-			case FLDouble => FCMPL
+			case FLFloat => FCMPL
 		}
 
 		val labelFalseName = "bexp_"+label+"_false"
@@ -105,7 +105,7 @@ object CompileExpr {
 	def compileValue(expr: TypeAst.TypeExpr.TyValue) : JVMBlock = expr match {
 		case TypeAst.TypeExpr.TyValue(str, typ) => typ match {
 			case FLInt|FLBoolean => Seq(ILOAD(Address(nameToAddress(str))))
-			case FLDouble => Seq(FLOAD(Address(nameToAddress(str))))
+			case FLFloat => Seq(FLOAD(Address(nameToAddress(str))))
 			case FLUnit => Seq()
 		}	
 	}
@@ -113,7 +113,7 @@ object CompileExpr {
 	def compileVal(expr: TypeAst.TypeExpr.TyVal) : JVMBlock = expr match {
 		case TypeAst.TypeExpr.TyVal(name, expr, exprTyp, typ) => exprTyp match {
 			case FLInt|FLBoolean => compileExpr(expr):+ISTORE(Address(nameToAddress(name)))
-			case FLDouble => compileExpr(expr):+FSTORE(Address(nameToAddress(name)))
+			case FLFloat => compileExpr(expr):+FSTORE(Address(nameToAddress(name)))
 			case FLUnit => compileExpr(expr)
 		}
 	}
@@ -127,7 +127,7 @@ object CompileExpr {
 		case expr: TypeAst.TypeExpr.TyValue => compileValue(expr)
 		case expr: TypeAst.TypeExpr.TyVal => compileVal(expr)
 		case expr: TypeAst.TypeExpr.TypeBexp.TyBop => compileBexp(expr)
-		case TypeAst.TypeExpr.TyDoubleExpr(num,typ) => Seq(LDC(Value(num.toString())))
+		case TypeAst.TypeExpr.TyFloatExpr(num,typ) => Seq(LDC(Value(num.toString())))
 		case TypeAst.TypeExpr.TyIntExpr(num,typ) => Seq(LDC(Value(num.toString())))
 		case TypeAst.TypeExpr.TyBooleanExpr(bool,typ) => if (bool) Seq(LDC(Value("1"))) else Seq(LDC(Value("0")))
 	}

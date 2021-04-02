@@ -9,7 +9,7 @@ object JVMOpcode {
 
 	def typeToString(typ: FLType): String = typ match {
 		case FLInt => "I"
-		case FLDouble => "F" 
+		case FLFloat => "F" 
 		case FLUnit => "V"
 		case FLBoolean => "Z"
 		case FLFunc(args,typ) => "(" + args.map(typeToString(_)).mkString + ")" + typeToString(typ)
@@ -50,19 +50,19 @@ object JVMOpcode {
 
 	val printFula = (typ: FLType) => MethodDecl("printFula", 1,2,FLFunc(Seq(typ),FLUnit),Seq(
 		GETSTATIC(ClassCall("java/lang/System/out"),FieldType("Ljava/io/PrintStream;")),
-		if (typ==FLDouble) FLOAD(Address("0")) else ILOAD(Address("0")),
+		if (typ==FLFloat) FLOAD(Address("0")) else ILOAD(Address("0")),
 		INVOKEVIRTUAL(MethodCall("java/io/PrintStream/print",FLFunc(Seq(typ),FLUnit),"")),
 		RETURN
 	))
 
 	val printlnFula = (typ: FLType) => MethodDecl("printlnFula", 1,2,FLFunc(Seq(typ),FLUnit),Seq(
 		GETSTATIC(ClassCall("java/lang/System/out"),FieldType("Ljava/io/PrintStream;")),
-		if (typ==FLDouble) FLOAD(Address("0")) else ILOAD(Address("0")),
+		if (typ==FLFloat) FLOAD(Address("0")) else ILOAD(Address("0")),
 		INVOKEVIRTUAL(MethodCall("java/io/PrintStream/println",FLFunc(Seq(typ),FLUnit),"")),
 		RETURN
 	))
 
-	val utils: JVMProgCore = Seq(FLInt, FLDouble, FLBoolean).flatMap(typ => Seq(printFula(typ),printlnFula(typ)))
+	val utils: JVMProgCore = Seq(FLInt, FLFloat, FLBoolean).flatMap(typ => Seq(printFula(typ),printlnFula(typ)))
 
 	trait Opcode
 

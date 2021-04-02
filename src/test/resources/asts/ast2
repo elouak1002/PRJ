@@ -8,10 +8,10 @@ List(
 	Main(main,Unit,
 		List(
 			IntExpr(10), 
-			DoubleExpr(10.02), 
-			DoubleExpr(10.02), 
-			DoubleExpr(10.02), 
-			DoubleExpr(10.02), 
+			FloatExpr(10.02), 
+			FloatExpr(10.02), 
+			FloatExpr(10.02), 
+			FloatExpr(10.02), 
 			Write(IntExpr(10))
 			)
 		)

@@ -14,7 +14,7 @@ object TypeAst {
 		case class TyValue(s: String, typed: FLType) extends TypeExpr
 		case class TyWrite(e: TypeExpr, typed: FLType=FLUnit) extends TypeExpr
 		case class TyIntExpr(i: Int, typed: FLType=FLInt) extends TypeExpr
-		case class TyDoubleExpr(d: Double, typed: FLType=FLDouble) extends TypeExpr
+		case class TyFloatExpr(d: Float, typed: FLType=FLFloat) extends TypeExpr
 		case class TyBooleanExpr(b: Boolean, typed: FLType=FLBoolean) extends TypeExpr
 		case class TyAop(o: String, a1: TypeExpr, a2: TypeExpr, typed: FLType) extends TypeExpr
 		case class TyVal(name: String, e: TypeExpr, exprTyp: FLType, typed: FLType=FLUnit) extends TypeExpr
@@ -43,7 +43,7 @@ object TypeAst {
 		case TypeExpr.TyValue(_,typ) => typ
 		case TypeExpr.TyWrite(_,typ) => typ
 		case TypeExpr.TyIntExpr(_,typ) => typ
-		case TypeExpr.TyDoubleExpr(_,typ) => typ
+		case TypeExpr.TyFloatExpr(_,typ) => typ
 		case TypeExpr.TyBooleanExpr(_,typ) => typ
 		case TypeExpr.TyAop(_,_,_,typ) => typ
 		case TypeExpr.TyVal(_,_,_,typ) => typ

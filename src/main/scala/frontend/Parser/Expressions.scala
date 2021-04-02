@@ -25,7 +25,7 @@ object Expressions {
 
 	// parsing of integers, double, boolean and values
 	def int[_: P] : P[Ast.Expr.IntExpr] = P (Lexicals.Integer).map{ case( Ast.Tok.IntegerTok(num)) => Ast.Expr.IntExpr(num)}
-	def double[_: P] : P[Ast.Expr.DoubleExpr] = P (Lexicals.Double).map{ case( Ast.Tok.DoubleTok(num)) => Ast.Expr.DoubleExpr(num)}
+	def double[_: P] : P[Ast.Expr.FloatExpr] = P (Lexicals.Float).map{ case( Ast.Tok.FloatTok(num)) => Ast.Expr.FloatExpr(num)}
 	def boolean[_ : P] : P[Ast.Expr.BooleanExpr] = P(Lexicals.Boolean).map{ case( Ast.Tok.BooleanTok(bool)) => Ast.Expr.BooleanExpr(bool)}
 	def value[_ : P] : P[Ast.Expr.Value] = P (Lexicals.Identifier).map{ case(Ast.Tok.Identifier(id)) => Ast.Expr.Value(id) }
 	// def some[_ : P] : P[Ast.Expr.Some] = P("Some(" ~ expr ~ ")").map{ case As }
